@@ -3,12 +3,12 @@
 ## Introducing the Team
 
 **Tools Lead**  
-- Raha  
-- Atri (Assist)
+- Rahamat Zaman  
+- Atri Mehta (Assist)
 
 **Engine Lead**  
 - Yash Malegaonkar  
-- Atri (Assist)
+- Atri Mehta (Assist)
 
 **Design Lead**  
 - Jay Kumar  
