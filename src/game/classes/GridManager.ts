@@ -1,9 +1,9 @@
 export default class GridManager {
     private scene: Phaser.Scene;
     public cellSize: number;
-    private gridWidth: number;
-    private gridHeight: number;
-    private cells: Phaser.GameObjects.Rectangle[][];
+    public gridWidth: number;
+    public gridHeight: number;
+    public cells: Phaser.GameObjects.Rectangle[][];
 
     constructor(scene: Phaser.Scene, cellSize: number, gridWidth: number, gridHeight: number) {
         this.scene = scene;

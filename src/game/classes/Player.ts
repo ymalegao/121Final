@@ -5,7 +5,7 @@ export default class Player {
     private scene: Phaser.Scene;
     private sprite: Phaser.GameObjects.Rectangle;
     private gridManager: GridManager;
-    private position: { x: number; y: number };
+    public position: { x: number; y: number };
 
     constructor(scene: Phaser.Scene, gridManager: GridManager, startX: number, startY: number) {
         this.scene = scene;
