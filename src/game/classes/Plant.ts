@@ -38,4 +38,5 @@ export default class Plant implements IPlant {
     public getGrowthLevel(): number {
         return this.growthLevel;
     }
+    
 }

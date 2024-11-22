@@ -1,6 +1,7 @@
 import GridManager from './GridManager';
 import Plant from './Plant';
 import SunPlant from './SunPlant';
+import { CellData } from './GridManager';
 
 export default class PlantManager {
     private scene: Phaser.Scene;
@@ -48,4 +49,22 @@ export default class PlantManager {
     public getPlantAt(gridX: number, gridY: number): Plant | null {
         return this.plants.find((plant) => plant.i === gridX && plant.j === gridY) || null;
     }
+    public updatePlants(): void {
+        this.plants.forEach((plant) => {
+            const { i, j } = plant;
+    
+            // Retrieve the cell data safely
+            const cellData: CellData = this.gridManager.cells[i][j].getData('cellData');
+    
+            // Check if the plant can grow
+            if (cellData.sun >= 5 && cellData.water >= 5) {
+                plant.grow(); // Consume resources and grow the plant
+                cellData.sun = 0; // Reset sun
+                cellData.water -= 5; // Deduct water
+    
+                // Update the cell data back in the grid
+                this.gridManager.cells[i][j].setData('cellData', cellData);
+            }
+        });
+    }    
 }

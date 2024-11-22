@@ -1,6 +1,5 @@
 import GridManager from './GridManager';
 
-
 export default class Player {
     private scene: Phaser.Scene;
     private sprite: Phaser.GameObjects.Rectangle;
