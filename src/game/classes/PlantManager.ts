@@ -49,22 +49,43 @@ export default class PlantManager {
     public getPlantAt(gridX: number, gridY: number): Plant | null {
         return this.plants.find((plant) => plant.i === gridX && plant.j === gridY) || null;
     }
+
+// Get adjacent plants
+private getAdjacentPlants(gridX: number, gridY: number): Plant[] {
+    const adjacentPositions = [
+        { i: gridX - 1, j: gridY },
+        { i: gridX + 1, j: gridY },
+        { i: gridX, j: gridY - 1 },
+        { i: gridX, j: gridY + 1 },
+    ];
+
+    return adjacentPositions
+        .filter(pos => this.gridManager.isWithinBounds(pos.i, pos.j))
+        .map(pos => this.getPlantAt(pos.i, pos.j))
+        .filter((plant): plant is Plant => plant !== null);
+}
+
+    // Update all plants
     public updatePlants(): void {
         this.plants.forEach((plant) => {
             const { i, j } = plant;
-    
-            // Retrieve the cell data safely
+
+            // Retrieve the cell data
             const cellData: CellData = this.gridManager.cells[i][j].getData('cellData');
-    
-            // Check if the plant can grow
-            if (cellData.sun >= 5 && cellData.water >= 5) {
-                plant.grow(); // Consume resources and grow the plant
+
+            // Check growth conditions
+            if (plant.checkGrowthConditions(cellData.sun, cellData.water)) {
+                plant.grow();
                 cellData.sun = 0; // Reset sun
                 cellData.water -= 5; // Deduct water
-    
-                // Update the cell data back in the grid
-                this.gridManager.cells[i][j].setData('cellData', cellData);
             }
+
+            // Apply adjacency effects
+            const adjacentPlants = this.getAdjacentPlants(i, j);
+            plant.applyAdjacentEffects(adjacentPlants);
+
+            // Update the cell data in the grid
+            this.gridManager.cells[i][j].setData('cellData', cellData);
         });
-    }    
+    }
 }
