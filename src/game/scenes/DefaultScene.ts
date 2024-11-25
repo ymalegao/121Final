@@ -20,8 +20,10 @@ export default class DefaultScene extends Phaser.Scene {
     }
 
     public preload() {
-        this.load.image('sunflower', '/assets/Sunflower.png');
-        this.load.image('chomper', '/assets/Chomper.png');
+        console.log('Preloading assets...');
+
+        this.load.image('sunflower', '/121Final//assets/Sunflower.png');
+        this.load.image('chomper', '/121Final//assets/Chomper.png');
     }
 
     create() {
