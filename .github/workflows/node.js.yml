@@ -1,11 +1,10 @@
-name: Deploy Phaser React Project
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
       - main # Deploy only when changes are pushed to the main branch
-      - test-branch # Add this branch for testing
-
+      - test-branch # Deploy only when changes are pushed to the test-branch
 
 jobs:
   build-and-deploy:
@@ -35,4 +34,4 @@ jobs:
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist # Ensure this matches the output directory
+        publish_dir: ./dist
