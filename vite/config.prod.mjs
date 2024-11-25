@@ -18,7 +18,7 @@ const phasermsg = () => {
 }
 
 export default defineConfig({
-    base: './',
+    base: '/121Final/', // GitHub Pages expects the repository name here
     plugins: [
         react(),
         phasermsg()
@@ -44,3 +44,4 @@ export default defineConfig({
         }
     }
 });
+
