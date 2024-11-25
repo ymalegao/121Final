@@ -14,6 +14,8 @@ export default class DefaultScene extends Phaser.Scene {
     private waterText: Phaser.GameObjects.Text;
     private sunBar: Phaser.GameObjects.Graphics;
     private waterBar: Phaser.GameObjects.Graphics;
+    private baseCostSun: number = 100;
+    private baseCostWater: number = 75;
 
     constructor() {
         super('DefaultScene');
@@ -27,6 +29,8 @@ export default class DefaultScene extends Phaser.Scene {
         const cellSize = 64;
         const gridWidth = 10;
         const gridHeight = 10;
+        //let baseCostSun = 100;
+        //let baseCostWater = 75;
 
         this.gridManager = new GridManager(this, cellSize, gridWidth, gridHeight);
         this.player = new Player(this, this.gridManager, 0, 0);
@@ -40,7 +44,7 @@ export default class DefaultScene extends Phaser.Scene {
             if (event.key === 'ArrowRight') this.player.move('right');
         });
 
-        // Plant sunflower
+        // Place sunflower
         this.input.keyboard.on('keydown-P', () => {
             this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
             //console.log(this.sunText);
@@ -48,11 +52,6 @@ export default class DefaultScene extends Phaser.Scene {
 
         // Progress turn -> Receive Sun and Water
         this.input.keyboard.on('keydown-N', () => {
-            this.advanceTurn();
-        });
-
-        // Advance turn logic
-        this.input.keyboard.on('keydown-Space', () => {
             this.advanceTurn();
         });
 
@@ -105,17 +104,24 @@ export default class DefaultScene extends Phaser.Scene {
     
         // Update the counters and progress bars once, after summing up
         this.updateSunAndWaterUI(totalSun, totalWater);
-    
-        // Add event listener for planting with the 'P' key
+        
+        
+
+        // Add event listener for planting with the 'P' key (Calculating how much plant costs)
         document.addEventListener('keydown', (event) => {
             if (event.key === 'P' || event.key === 'p') { // Check if 'P' (or lowercase 'p') is pressed
                 if (totalSun >= 100 && totalWater >= 75) { // Ensure sufficient resources
-                    totalSun -= 100;
-                    totalWater -= 75;
-                    console.log(`Planted! Remaining Sun: ${totalSun}, Water: ${totalWater}`);
-    
-                    // Update the counters and progress bars after planting
-                    this.updateSunAndWaterUI(totalSun, totalWater);
+                    if( (this.plantManager.getAdjacentPlants(this.player.position.x, this.player.position.y)).length == 1){
+                        // Discount for adjacency
+                        totalSun -= this.baseCostSun * .5;
+                        totalWater -= this.baseCostWater * .5;
+                        this.updateSunAndWaterUI(totalSun, totalWater);
+                    }
+                    else{
+                        totalSun -= this.baseCostSun;
+                        totalWater -= this.baseCostWater;
+                        this.updateSunAndWaterUI(totalSun, totalWater);
+                    }
                 } else {
                     console.log("Not enough resources to plant!");
                 }

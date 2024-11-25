@@ -65,8 +65,6 @@ export default class Plant implements IPlant {
         if (this.growthUnlocked) {
             this.growthLevel++;
             this.sprite.setScale(0.5 + 0.2 * this.growthLevel); // Increase size with growth
-            this.sunLight -= 50;
-            this.water -= 4;
         }
     }
 

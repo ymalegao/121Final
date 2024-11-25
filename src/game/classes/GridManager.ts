@@ -77,6 +77,7 @@
 export interface CellData {
     sun: number;
     water: number;
+    hasPlant: boolean; //Added for tracking adjacency of plants
 }
 
 export default class GridManager {

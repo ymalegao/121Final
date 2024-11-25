@@ -1,3 +1,4 @@
+
 import GridManager from './GridManager';
 import Plant from './Plant';
 import SunPlant from './SunPlant';
@@ -35,14 +36,7 @@ export default class PlantManager {
 
         // Add the plant to the list
         this.plants.push(plant);
-    }
-
-    // Grow the plant at a specific grid position
-    public growPlant(gridX: number, gridY: number): void {
-        const plant = this.getPlantAt(gridX, gridY);
-        if (plant) {
-            plant.grow();
-        }
+        console.log(`Planted ${type} at (${gridX}, ${gridY})`);
     }
 
     // Get the plant at a specific grid position
@@ -50,20 +44,20 @@ export default class PlantManager {
         return this.plants.find((plant) => plant.i === gridX && plant.j === gridY) || null;
     }
 
-// Get adjacent plants
-private getAdjacentPlants(gridX: number, gridY: number): Plant[] {
-    const adjacentPositions = [
-        { i: gridX - 1, j: gridY },
-        { i: gridX + 1, j: gridY },
-        { i: gridX, j: gridY - 1 },
-        { i: gridX, j: gridY + 1 },
-    ];
+    // Get adjacent plants
+    public getAdjacentPlants(gridX: number, gridY: number): Plant[] {
+        const adjacentPositions = [
+            { i: gridX - 1, j: gridY },
+            { i: gridX + 1, j: gridY },
+            { i: gridX, j: gridY - 1 },
+            { i: gridX, j: gridY + 1 },
+        ];
 
-    return adjacentPositions
-        .filter(pos => this.gridManager.isWithinBounds(pos.i, pos.j))
-        .map(pos => this.getPlantAt(pos.i, pos.j))
-        .filter((plant): plant is Plant => plant !== null);
-}
+        return adjacentPositions
+            .filter(pos => this.gridManager.isWithinBounds(pos.i, pos.j))
+            .map(pos => this.getPlantAt(pos.i, pos.j))
+            .filter((plant): plant is Plant => plant !== null);
+    }
 
     // Update all plants
     public updatePlants(): void {
