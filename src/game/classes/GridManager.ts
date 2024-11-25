@@ -143,6 +143,8 @@ export default class GridManager {
 
                 // Store the updated data back in the cell
                 this.cells[y][x].setData('cellData', cellData);
+                console.log(cellData.sun);
+                console.log(cellData.water);
             }
         }
     }

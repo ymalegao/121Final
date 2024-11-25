@@ -43,6 +43,12 @@ export default class DefaultScene extends Phaser.Scene {
         // Plant sunflower
         this.input.keyboard.on('keydown-P', () => {
             this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
+            //console.log(this.sunText);
+        });
+
+        // Progress turn -> Receive Sun and Water
+        this.input.keyboard.on('keydown-N', () => {
+            this.advanceTurn();
         });
 
         // Advance turn logic
@@ -85,7 +91,7 @@ export default class DefaultScene extends Phaser.Scene {
     private updateResourceDisplay() {
         let totalSun = 0;
         let totalWater = 0;
-
+    
         // Sum up the sun and water values for all cells
         for (let y = 0; y < this.gridManager.gridHeight; y++) {
             for (let x = 0; x < this.gridManager.gridWidth; x++) {
@@ -96,21 +102,54 @@ export default class DefaultScene extends Phaser.Scene {
                 }
             }
         }
-
-        // Update the text display
+    
+        // Update the counters and progress bars once, after summing up
+        this.updateSunAndWaterUI(totalSun, totalWater);
+    
+        // Add event listener for planting with the 'P' key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'P' || event.key === 'p') { // Check if 'P' (or lowercase 'p') is pressed
+                if (totalSun >= 100 && totalWater >= 75) { // Ensure sufficient resources
+                    totalSun -= 100;
+                    totalWater -= 75;
+                    console.log(`Planted! Remaining Sun: ${totalSun}, Water: ${totalWater}`);
+    
+                    // Update the counters and progress bars after planting
+                    this.updateSunAndWaterUI(totalSun, totalWater);
+                } else {
+                    console.log("Not enough resources to plant!");
+                }
+            }
+        });
+    }
+    
+    // Helper method to update both sun and water UI components
+    private updateSunAndWaterUI(totalSun: number, totalWater: number): void {
+        // Update the text displays
         this.sunText.setText(`Sun: ${totalSun}`);
         this.waterText.setText(`Water: ${totalWater}`);
-
-        // Update the progress bars
-        const sunPercentage = Phaser.Math.Clamp(totalSun / (this.gridManager.gridWidth * this.gridManager.gridHeight * 5), 0, 1);
-        const waterPercentage = Phaser.Math.Clamp(totalWater / (this.gridManager.gridWidth * this.gridManager.gridHeight * 10), 0, 1);
-
+    
+        // Calculate progress percentages
+        const sunPercentage = Phaser.Math.Clamp(
+            totalSun / (this.gridManager.gridWidth * this.gridManager.gridHeight * 5),
+            0,
+            1
+        );
+        const waterPercentage = Phaser.Math.Clamp(
+            totalWater / (this.gridManager.gridWidth * this.gridManager.gridHeight * 10),
+            0,
+            1
+        );
+    
+        // Update the sun bar
         this.sunBar.clear();
         this.sunBar.fillStyle(0xFFFF00, 1); // Yellow for sun
         this.sunBar.fillRect(100, 10, 200 * sunPercentage, 20);
-
+    
+        // Update the water bar
         this.waterBar.clear();
         this.waterBar.fillStyle(0x1E90FF, 1); // Blue for water
-        this.waterBar.fillRect(100, 34, 200 * waterPercentage, 20);
+        this.waterBar.fillRect(120, 34, 200 * waterPercentage, 20);
     }
+    
 }

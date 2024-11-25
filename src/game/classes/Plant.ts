@@ -14,7 +14,7 @@ export default class Plant implements IPlant {
     protected growthLevel: number;
     protected sprite: Phaser.GameObjects.Sprite;
 
-    public sunlight: number; // Required sunlight
+    public sunLight: number; // Required sunlight
     public water: number; // Required water
     public growthUnlocked: boolean; // Can the plant grow
     public upgradeCost: number; // Upgrade cost for the plant
@@ -32,7 +32,7 @@ export default class Plant implements IPlant {
         this.i = gridX;
         this.j = gridY;
         this.growthLevel = 1; // Start at level 1
-        this.sunlight = sunlight;
+        this.sunLight = sunlight;
         this.water = water;
         this.growthUnlocked = false;
         this.upgradeCost = upgradeCost;
@@ -52,7 +52,7 @@ export default class Plant implements IPlant {
 
     // Check growth conditions based on sunlight and water
     public checkGrowthConditions(currentSunlight: number, currentWater: number): boolean {
-        if (currentSunlight >= this.sunlight && currentWater >= this.water) {
+        if (currentSunlight >= this.sunLight && currentWater >= this.water) {
             this.growthUnlocked = true;
         } else {
             this.growthUnlocked = false;
@@ -65,6 +65,8 @@ export default class Plant implements IPlant {
         if (this.growthUnlocked) {
             this.growthLevel++;
             this.sprite.setScale(0.5 + 0.2 * this.growthLevel); // Increase size with growth
+            this.sunLight -= 50;
+            this.water -= 4;
         }
     }
 
