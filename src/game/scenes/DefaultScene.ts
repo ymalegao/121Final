@@ -5,9 +5,11 @@ import Phaser from 'phaser';
 import GridManager from '../classes/GridManager';
 import Player from '../classes/Player';
 import PlantManager from '../classes/PlantManager';
+import Zombie from '../classes/Zombie';
 
 export default class DefaultScene extends Phaser.Scene {
-    private gridManager: GridManager;
+    public gridManager: GridManager;
+    private isGameOver: boolean = false;
     private player: Player;
     private plantManager: PlantManager;
     private sunText: Phaser.GameObjects.Text;
@@ -15,7 +17,7 @@ export default class DefaultScene extends Phaser.Scene {
     private sunBar: Phaser.GameObjects.Graphics;
     private waterBar: Phaser.GameObjects.Graphics;
     private baseCostSun: number = 100;
-    private baseCostWater: number = 75;
+    private baseCostWater: number = 100;
 
     constructor() {
         super('DefaultScene');
@@ -23,6 +25,7 @@ export default class DefaultScene extends Phaser.Scene {
 
     public preload() {
         this.load.image('sunflower', '../assets/Sunflower.png');
+        this.load.image('Zombie', '../assets/Chomper.png');
     }
 
     create() {
@@ -31,6 +34,9 @@ export default class DefaultScene extends Phaser.Scene {
         const gridHeight = 10;
         //let baseCostSun = 100;
         //let baseCostWater = 75;
+
+        this.isGameOver = false; // Reset the game-over flag
+        this.zombies = []; // Clear the zombies array
 
         this.gridManager = new GridManager(this, cellSize, gridWidth, gridHeight);
         this.player = new Player(this, this.gridManager, 0, 0);
@@ -44,11 +50,11 @@ export default class DefaultScene extends Phaser.Scene {
             if (event.key === 'ArrowRight') this.player.move('right');
         });
 
-        // Place sunflower
-        this.input.keyboard.on('keydown-P', () => {
-            this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
-            //console.log(this.sunText);
-        });
+        // Place sunflower (commented out for now)
+        // this.input.keyboard.on('keydown-P', () => {
+        //     this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
+        //     //console.log(this.sunText);
+        // });
 
         // Progress turn -> Receive Sun and Water
         this.input.keyboard.on('keydown-N', () => {
@@ -76,16 +82,36 @@ export default class DefaultScene extends Phaser.Scene {
 
     private advanceTurn(): void {
         console.log('Advancing time...');
-        
-        // Update sun and water levels for all cells
-        this.gridManager.updateSunAndWaterLevels(); 
-        
-        // Check plant growth based on updated sun and water levels
-        this.plantManager.updatePlants(); 
-        
-        // Update the sun and water resource display
+    
+        // Stop advancing if the game is over
+        if (this.isGameOver) {
+            return;
+        }
+    
+        // Update grid resources and plants
+        this.gridManager.updateSunAndWaterLevels();
+        this.plantManager.updatePlants();
+    
+        // Move all zombies
+        this.zombies.forEach((zombie) => {
+            zombie.move(); // Move the zombie forward
+            if (zombie.hasReachedEnd()) {
+                console.log('Zombie reached the end of the grid!');
+                this.gameOver(); // Trigger game over
+            }
+        });
+    
+        // Optionally spawn new zombies every turn or at intervals
+        if (Phaser.Math.Between(0, 1) === 1) {
+            this.spawnZombie();
+        }
+    
+        // Update UI resources
         this.updateResourceDisplay();
     }
+    
+    
+    
 
     private updateResourceDisplay() {
         let totalSun = 0;
@@ -96,8 +122,8 @@ export default class DefaultScene extends Phaser.Scene {
             for (let x = 0; x < this.gridManager.gridWidth; x++) {
                 const cellData = this.gridManager.getCellResources(x, y);
                 if (cellData) {
-                    totalSun += cellData.sun;
-                    totalWater += cellData.water;
+                    totalSun = cellData.sun;
+                    totalWater = cellData.water;
                 }
             }
         }
@@ -111,7 +137,7 @@ export default class DefaultScene extends Phaser.Scene {
         document.addEventListener('keydown', (event) => {
             if (event.key === 'P' || event.key === 'p') { // Check if 'P' (or lowercase 'p') is pressed
                 if (totalSun >= 100 && totalWater >= 75) { // Ensure sufficient resources
-                    if( (this.plantManager.getAdjacentPlants(this.player.position.x, this.player.position.y)).length == 1){
+                    if( (this.plantManager.getAdjacentPlants(this.player.position.x, this.player.position.y)).length > 0){ // changed to > 0, used to be == 1
                         // Discount for adjacency
                         totalSun -= this.baseCostSun * .5;
                         totalWater -= this.baseCostWater * .5;
@@ -122,6 +148,8 @@ export default class DefaultScene extends Phaser.Scene {
                         totalWater -= this.baseCostWater;
                         this.updateSunAndWaterUI(totalSun, totalWater);
                     }
+                    this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
+                    this.gridManager.sunPlants += 1;
                 } else {
                     console.log("Not enough resources to plant!");
                 }
@@ -157,5 +185,58 @@ export default class DefaultScene extends Phaser.Scene {
         this.waterBar.fillStyle(0x1E90FF, 1); // Blue for water
         this.waterBar.fillRect(120, 34, 200 * waterPercentage, 20);
     }
+    private zombies: Zombie[] = []; // Array to store all zombies
+
+    // Spawn a new zombie
+    private spawnZombie(): void {
+        const gridX = this.gridManager.gridWidth - 1; // Spawn at the far-right column
+        const gridY = Phaser.Math.Between(0, this.gridManager.gridHeight - 1); // Random row
+        const zombie = new Zombie(this, gridX, gridY, 'Zombie'); // Use the correct texture key
+        this.zombies.push(zombie);
+        console.log(`Zombie spawned at (${gridX}, ${gridY})`);
+    }
+    public gameOver(): void {
+        console.log('Game Over!');
+        this.isGameOver = true; // Set the game-over flag
+    
+        // Stop all zombies
+        this.zombies.forEach((zombie) => zombie.destroy());
+        this.zombies = []; // Clear all zombies
+    
+        // Display "Game Over" message
+        this.add.text(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY - 30,
+            'Game Over!',
+            {
+                fontFamily: '"Press Start 2P", sans-serif',
+                fontSize: '24px',
+                color: '#FF0000',
+            }
+        ).setOrigin(0.5);
+    
+        // Display "Press R to Restart" message
+        this.add.text(
+            this.cameras.main.centerX,
+            this.cameras.main.centerY + 20,
+            'Press R to Restart',
+            {
+                fontFamily: '"Press Start 2P", sans-serif',
+                fontSize: '16px',
+                color: '#FFFFFF',
+            }
+        ).setOrigin(0.5);
+    
+        // Restart game on "R" key press
+        const rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+        rKey.once('down', () => {
+            console.log('Restarting game...');
+            this.scene.restart(); // Restart the current scene
+        });
+    }
+    
+    
+    
+    
     
 }

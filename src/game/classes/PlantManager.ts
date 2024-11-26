@@ -1,4 +1,3 @@
-
 import GridManager from './GridManager';
 import Plant from './Plant';
 import SunPlant from './SunPlant';
