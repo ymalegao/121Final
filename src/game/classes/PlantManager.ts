@@ -1,6 +1,7 @@
 import GridManager from './GridManager';
 import Plant from './Plant';
 import SunPlant from './SunPlant';
+import AttackPlant from './AttackPlant';
 import { CellData } from './GridManager';
 
 export default class PlantManager {
@@ -28,6 +29,9 @@ export default class PlantManager {
             case 'sun':
                 plant = new SunPlant(this.scene, gridX, gridY);
                 break;
+            case 'attack':
+                plant = new AttackPlant(this.scene, gridX, gridY);
+            break;
             default:
                 console.log('Invalid plant type.');
                 return;

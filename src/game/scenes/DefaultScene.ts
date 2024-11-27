@@ -26,6 +26,7 @@ export default class DefaultScene extends Phaser.Scene {
     public preload() {
         this.load.image('sunflower', '../assets/Sunflower.png');
         this.load.image('Zombie', '../assets/Chomper.png');
+        this.load.image('attackPlant', '../assets/attackPlant.png');
     }
 
     create() {
@@ -152,6 +153,22 @@ export default class DefaultScene extends Phaser.Scene {
                     this.gridManager.sunPlants += 1;
                 } else {
                     console.log("Not enough resources to plant!");
+                }
+            }
+
+        
+            if (event.key === 'A' || event.key === 'a') {  // plant attack plant
+                if (totalSun >= 100 && totalWater >= 75) { // check if enough resources
+                    if ((this.plantManager.getAdjacentPlants(this.player.position.x, this.player.position.y)).length > 0) {
+                        totalSun -= this.baseCostSun * .5;  // discount for adjacent positioning
+                        totalWater -= this.baseCostWater * .5;
+                        this.updateSunAndWaterUI(totalSun, totalWater);
+                    } else {
+                        totalSun -= this.baseCostSun;
+                        totalWater -= this.baseCostWater;
+                        this.updateSunAndWaterUI(totalSun, totalWater);
+                    }
+                this.plantManager.plant('attack', this.player.position.x, this.player.position.y);
                 }
             }
         });
