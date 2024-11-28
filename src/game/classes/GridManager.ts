@@ -1,3 +1,6 @@
+import GridState from './GridState';
+
+
 export interface CellData {
     sun: number;
     water: number;
@@ -7,11 +10,13 @@ export interface CellData {
 export default class GridManager {
     public gridManager: GridManager;
     private scene: Phaser.Scene;
+    public gridState: GridState;
     public cellSize: number;
     public gridWidth: number;
     public gridHeight: number;
     public cells: Phaser.GameObjects.Rectangle[][];
     public sunPlants: number;
+    
 
     constructor(scene: Phaser.Scene, cellSize: number, gridWidth: number, gridHeight: number) {
         this.scene = scene;
@@ -20,6 +25,7 @@ export default class GridManager {
         this.gridHeight = gridHeight;
         this.cells = [];
         this.sunPlants = 0;
+        this.gridState = new GridState(gridWidth, gridHeight);
 
         this.createGrid();
     }
@@ -33,12 +39,12 @@ export default class GridManager {
                     y * this.cellSize + this.cellSize / 2,
                     this.cellSize - 2,
                     this.cellSize - 2,
-                    0xcccccc
+                    0xcccccc // Light grey
                 ).setOrigin(0.5);
                 this.cells[y][x] = cell;
 
                 // Initialize cell data for each grid cell (initial sun and water levels)
-                cell.setData('cellData', { sun: 0, water: 0 } as CellData);
+                this.gridState.setCell(x, y, 0, 0, 0, 0);
             }
         }
     }
@@ -61,18 +67,18 @@ export default class GridManager {
                 // Generate random sun and water levels
                 const randomSun = Phaser.Math.Between(0, 100) + this.sunPlants; // Sun energy is immediate and lost
                 const randomWater = Phaser.Math.Between(0, 100); // Water accumulates
-
+                
+                const { plantType, plantLevel, sunLevel, waterLevel } = this.gridState.getCell(x, y);
                 // Get cell data
-                const cellData: CellData = this.cells[y][x].getData('cellData');
 
                 // Update sun and water levels
-                cellData.sun += randomSun; // Sun energy is overwritten each turn
-                cellData.water += Math.min(cellData.water + randomWater, 100); // Water accumulates, but max value is 10
+                const newSunLevel = randomSun + sunLevel; // Sun energy is overwritten each turn
+                const newWaterLevel =  Math.min(waterLevel + randomWater, 100); // Water accumulates, but max value is 10
+
+                this.gridState.setCell(x, y, plantType, plantLevel, newSunLevel, newWaterLevel);
 
                 // Store the updated data back in the cell
-                this.cells[y][x].setData('cellData', cellData);
-                console.log("Sun data: " + cellData.sun);
-                console.log("Water data: " + cellData.water);
+                
             }
         }
     }
@@ -80,7 +86,13 @@ export default class GridManager {
     // Get the cell resources (sun and water levels) safely
     public getCellResources(x: number, y: number): CellData | null {
         if (this.isWithinBounds(x, y)) {
-            return this.cells[y][x].getData('cellData');
+            const { sunLevel, waterLevel, plantType } = this.gridState.getCell(x, y);
+
+            return {
+                sun: sunLevel,
+                water: waterLevel,
+                hasPlant: plantType > 0,
+            };
         }
         return null;
     }

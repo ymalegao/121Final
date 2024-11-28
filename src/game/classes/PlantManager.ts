@@ -2,12 +2,12 @@ import GridManager from './GridManager';
 import Plant from './Plant';
 import SunPlant from './SunPlant';
 import AttackPlant from './AttackPlant';
-import { CellData } from './GridManager';
 
 export default class PlantManager {
     private scene: Phaser.Scene;
     private gridManager: GridManager;
     private plants: Plant[]; // Array of Plant objects
+
 
     constructor(scene: Phaser.Scene, gridManager: GridManager) {
         this.scene = scene;
@@ -39,6 +39,10 @@ export default class PlantManager {
 
         // Add the plant to the list
         this.plants.push(plant);
+        const cellData = this.gridManager.getCellResources(gridX, gridY);
+        if (cellData) {
+            this.gridManager.gridState.setCell(gridX, gridY, 1, 1, cellData.sun, cellData.water);
+        }
         console.log(`Planted ${type} at (${gridX}, ${gridY})`);
     }
 
@@ -68,21 +72,22 @@ export default class PlantManager {
             const { i, j } = plant;
 
             // Retrieve the cell data
-            const cellData: CellData = this.gridManager.cells[i][j].getData('cellData');
+            const { sunLevel, waterLevel, plantType, plantLevel } = this.gridManager.gridState.getCell(i, j);
 
             // Check growth conditions
-            if (plant.checkGrowthConditions(cellData.sun, cellData.water)) {
+            if (plant.checkGrowthConditions(sunLevel, waterLevel)) {
                 plant.grow();
-                cellData.sun = 0; // Reset sun
-                cellData.water -= 5; // Deduct water
+
+                // Update the byte array in GridState
+                this.gridManager.gridState.setCell(i, j, plantType, plantLevel + 1, sunLevel, Math.max(waterLevel - 5, 0));
+                // this.gridState.setCell(i, j, plantType, plantLevel + 1, 0, Math.max(waterLevel - 5, 0));
             }
+
 
             // Apply adjacency effects
             const adjacentPlants = this.getAdjacentPlants(i, j);
             plant.applyAdjacentEffects(adjacentPlants);
 
-            // Update the cell data in the grid
-            this.gridManager.cells[i][j].setData('cellData', cellData);
         });
     }
 }
