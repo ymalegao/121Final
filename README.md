@@ -38,3 +38,40 @@ Switching platforms will be the most challenging part of this project because it
 We hope to learn a lot by making a fun game and improving our design skills, whether pixel art, Photoshop, Paint 3D, Illustrator, or TypeScript with Phaser while also implementing our knowledge of effective game systems. Using these tools, we want to figure out how to build things like resource management, enemy waves, and player progression to keep our players engaged. We also want to learn how to use class abstractions so everyone can work together on different files and classes, making it easy to call them in the main game loop. This way, we can collaborate better and switch platforms without any problems. By keeping everything organized, we’ll improve our coding skills, understand how to keep the game engaging, and design systems that keep players interested.
 
 Our team hopes to learn how to have class abstractions so everyone can work together on different files and classes. All we must do is call them in the main game loop. This way, we can switch platforms quickly and collaborate better. By having everything abstracted and organized well, we can implement everything quickly. We hope to learn and utilize software design patterns we were taught in class, such as Facade, Memento, and Flyweight, and how to better optimize (refactor) our code.
+
+
+# Devlog Entry - [11/27/2024]
+
+## How We Satisfied the Software Requirements
+
+### F0.a: You control a character moving over a 2D grid.
+When you press the WASD keys or the arrow keys, the player (represented by a green square) moves in the direction pressed. The character can only move one grid space at a time, ensuring movement over a structured 2D grid.
+
+### F0.b: You advance time manually in the turn-based simulation.
+Pressing the `N` key advances the turn. Each turn, the player gains Sun and Water resources to place more plants. Zombies are also intended to progress closer to the player during each turn, keeping the turn-based gameplay in focus.
+
+### F0.c: You can reap or sow plants on grid cells only when you are near them.
+To plant crops, the player must be on the specific grid square where they want to plant. It is not possible to place crops on squares the player is not standing on or on squares that already contain a plant, ensuring strategic placement.
+
+### F0.d: Grid cells have sun and water levels. The incoming sun and water for each cell is somehow randomly generated each turn. Sun energy cannot be stored in a cell (it is used immediately or lost) while water moisture can be slowly accumulated over several turns.
+Sun and water levels are visually represented using progress bars. These levels are tied to each grid cell, which is implemented as an interface in the code. Sun levels are consumed immediately, while water accumulates over multiple turns.
+
+### F0.e: Each plant on the grid has a distinct type (e.g. one of 3 species) and a growth level (e.g. “level 1”, “level 2”, “level 3”).
+Plants can achieve three growth levels. Each growth level influences the multiplier for the plant's production. For example, a Sun Plant at level 2 produces resources at twice the base rate (product * 2).
+
+### F0.f: Simple spatial rules govern plant growth based on sun, water, and nearby plants (satisfying conditions unlock growth).
+When plants of the same type are placed next to each other, their future planting costs decrease. For example, two Sunflower Plants placed adjacent to each other reduce the cost of placing a third Sunflower Plant in proximity.
+
+### F0.g: A play scenario is completed when some condition is satisfied (e.g. at least X plants at growth level Y or above).
+The player loses when a Zombie reaches the leftmost column of the grid, providing a clear win/loss condition for the game.
+
+---
+
+## Reflection
+
+Looking back on how we achieved the F0 requirements, our team’s plan changed significantly. Initially, we planned to have separate "grow" and "fight" phases like in games such as *Clash of Clans*. However, we decided to combine these phases into a continuous game loop where combat and growth happen simultaneously. This change simplified our workflow and reduced the complexity of the game.
+
+Additionally, we had to adapt our tools. Initially, we planned to host the game using a simple live server setup. However, due to the nature of the Phaser project and the React-based repo we cloned, we had to integrate Vite as a build tool. This required us to build the game using `npm run build` and deploy the `dist/index.html` to GitHub Pages. While this made the setup process more challenging, it allowed us to optimize the game for deployment.
+
+Overall, these adjustments helped us streamline development, focus on core mechanics, and meet the F0 requirements effectively while learning valuable lessons about game design and deployment. 
+    
