@@ -24,9 +24,16 @@ export default class DefaultScene extends Phaser.Scene {
     }
 
     public preload() {
+        //IF YOU ARE PUSHING TO GITHUB USE /121Final//assets/... INSTEAD OF ../assets/... IDK WHY
+        //THIS IS FOR THE GITHUB PAGES
         this.load.image('sunflower', '/121Final//assets/Sunflower.png');
         this.load.image('Zombie', '/121Final//assets/Chomper.png');
         this.load.image('attackPlant', '/121Final//assets/attackPlant.png');
+
+        // THIS IS FOR LOCAL TESTING
+        // this.load.image('sunflower', '../assets/Sunflower.png');
+        // this.load.image('Zombie', '../assets/Chomper.png');
+        // this.load.image('attackPlant', '../assets/attackPlant.png');
     }
 
     create() {
