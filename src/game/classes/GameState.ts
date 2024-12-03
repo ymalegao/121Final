@@ -8,7 +8,7 @@ import DefaultScene from '../scenes/DefaultScene'; // Import the DefaultScene cl
 export interface SavedGameState {
     gridState: Uint8Array; // Serialized GridState
     playerPosition: { x: number; y: number };
-    plants: Plant[]; // Array of plant objects with their states
+    plants: any[]; // Array of plant objects with their states
     zombies: Zombie[]; // Array of zombies with their states
     totalSun: number; // Total sunlight
     totalWater: number; // Total water
@@ -18,7 +18,7 @@ export default class GameState {
     private gridState: GridState;
     private player: Player;
     private plantManager: PlantManager;
-    private zombies: Zombie[];
+    private zombies: any[];
     private undoStack: SavedGameState[] = [];
     private redoStack: SavedGameState[] = [];
     private scene: DefaultScene;
@@ -27,13 +27,13 @@ export default class GameState {
         gridState: GridState,
         player: Player,
         plantManager: PlantManager,
-        zombies: Zombie[],
+        zombies: any[],
         scene: DefaultScene // Pass the scene instance
     ) {
         this.gridState = gridState;
         this.player = player;
         this.plantManager = plantManager;
-        this.zombies = zombies;
+        this.zombies = zombies.map(zombie => zombie.getState());;
         this.scene = scene; // Assign the scene instance
     }
 
@@ -45,8 +45,8 @@ export default class GameState {
         const gameState: SavedGameState = {
             gridState: this.gridState.getRawState(), // Serialize the grid state
             playerPosition: { x: this.player.position.x, y: this.player.position.y },
-            plants: this.plantManager.plants.map(plant => plant.clone()), // Clone plant objects
-            zombies: this.zombies.map(zombie => zombie.clone()), // Clone zombie objects
+            plants: this.plantManager.plants.map(plant => plant.getState()), // Clone plant objects
+            zombies: this.zombies.map(zombie => zombie.getWorldPosition()), // Clone zombie objects
             totalSun: this.scene.totalSun, // Access totalSun from the scene
             totalWater: this.scene.totalWater, // Access totalWater from the scene
         };

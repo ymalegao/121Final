@@ -42,8 +42,12 @@ export default class Plant implements IPlant {
         this.sprite = this.scene.add.sprite(x, y, texture).setOrigin(0.5).setScale(0.5);
     }
 
+    getState() {
+        return { x: this.i, y: this.j, type: this.sprite };
+    }
+
     // Calculate the world position based on grid coordinates
-    protected getWorldPosition(gridX: number, gridY: number): { x: number; y: number } {
+    private getWorldPosition(gridX: number, gridY: number): { x: number; y: number } {
         const cellSize = 64; // Assuming a fixed cell size
         return {
             x: gridX * cellSize + cellSize / 2,

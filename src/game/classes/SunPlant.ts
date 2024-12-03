@@ -9,4 +9,6 @@ export default class SunPlant extends Plant {
     public produceSun(): number {
         return 5 * this.growthLevel; 
     }
+
+    
 }

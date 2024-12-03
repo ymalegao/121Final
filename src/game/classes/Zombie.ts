@@ -18,6 +18,10 @@ export default class Zombie {
         this.sprite = this.scene.add.sprite(x, y, texture).setOrigin(0.5).setScale(0.5);
     }
 
+    getState() {
+        return { x: this.i, y: this.j };
+    }
+
     // Calculate the world position based on grid coordinates
     private getWorldPosition(gridX: number, gridY: number): { x: number; y: number } {
         const cellSize = this.scene.gridManager.cellSize; // Access cell size from GridManager
