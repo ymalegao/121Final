@@ -38,7 +38,7 @@ class GridState {
 
     // Get the raw byte array (for saving/loading)
     public getRawState(): Uint8Array {
-        return this.stateArray;
+        return new Uint8Array(this.stateArray); // Return a copy
     }
 
     // Load a raw byte array into the grid

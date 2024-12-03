@@ -7,6 +7,8 @@ export interface CellData {
     hasPlant: boolean; //Added for tracking adjacency of plants
 }
 
+
+
 export default class GridManager {
     public gridManager: GridManager;
     private scene: Phaser.Scene;

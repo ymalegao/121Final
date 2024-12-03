@@ -30,6 +30,12 @@ export default class Player {
             this.sprite.setPosition(x, y);
         }
     }
+
+    public setPosition(x: number, y: number): void {
+        this.position = { x, y };
+        const { x: worldX, y: worldY } = this.gridManager.getCellWorldPosition(x, y);
+        this.sprite.setPosition(worldX, worldY);
+    }
 }
 
 

@@ -5,6 +5,7 @@ interface IPlant {
     water: number; // Required water
     growthUnlocked: boolean; // Indicates if the plant can grow
     upgradeCost: number; // Cost to upgrade the plant
+    
 }
 
 export default class Plant implements IPlant {
@@ -12,7 +13,7 @@ export default class Plant implements IPlant {
     public j: number; // Grid column
     protected scene: Phaser.Scene;
     protected growthLevel: number;
-    protected sprite: Phaser.GameObjects.Sprite;
+    public sprite: Phaser.GameObjects.Sprite;
 
     public sunLight: number; // Required sunlight
     public water: number; // Required water
@@ -86,6 +87,10 @@ export default class Plant implements IPlant {
             this.upgradeCost -= discount * sameTypeCount;
             if (this.upgradeCost < 0) this.upgradeCost = 0;
         }
+    }
+
+    public clone(): Plant {
+        return new Plant(this.scene, this.i, this.j, 'plant', this.sunLight, this.water, this.upgradeCost);
     }
 
     

@@ -44,6 +44,18 @@ export default class Zombie {
         }
         return false;
     }
+
+    public clone(): Zombie {    
+        return new Zombie(this.scene, this.i, this.j, 'Zombie');
+    }
+
+    public redraw(): void {
+        if (this.sprite) {
+            this.sprite.destroy(); // Remove old sprite
+        }
+        const { x, y } = this.getWorldPosition(this.i, this.j);
+        this.sprite = this.scene.add.sprite(x, y, 'zombie').setOrigin(0.5).setScale(0.5);
+    }
         
     
     

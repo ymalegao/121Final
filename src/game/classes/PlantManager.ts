@@ -6,7 +6,7 @@ import AttackPlant from './AttackPlant';
 export default class PlantManager {
     private scene: Phaser.Scene;
     private gridManager: GridManager;
-    private plants: Plant[]; // Array of Plant objects
+    public plants: Plant[]; // Array of Plant objects
 
 
     constructor(scene: Phaser.Scene, gridManager: GridManager) {
@@ -88,6 +88,17 @@ export default class PlantManager {
             const adjacentPlants = this.getAdjacentPlants(i, j);
             plant.applyAdjacentEffects(adjacentPlants);
 
+        });
+    }
+
+    public redrawPlants(): void {
+        // Clear all existing plant sprites
+        this.plants.forEach((plant) => {
+            if (plant.sprite) {
+                plant.sprite.destroy(); // Destroy old sprite
+            }
+            const { x, y } = this.gridManager.getCellWorldPosition(plant.i, plant.j);
+            plant.sprite = this.scene.add.sprite(x, y, 'plant').setOrigin(0.5).setScale(0.5);
         });
     }
 }
