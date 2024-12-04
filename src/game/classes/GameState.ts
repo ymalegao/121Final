@@ -36,6 +36,19 @@ export default class GameState {
         this.zombies = zombies.map(zombie => zombie.getState());;
         this.scene = scene; // Assign the scene instance
     }
+     // Serialize the game state for saving
+     public serialize(): string {
+        const currentState = this.getCurrentState();
+        return JSON.stringify(currentState);
+    }
+
+    // Deserialize and restore game state
+    public static deserialize(data: string, gridState: GridState, player: Player, plantManager: PlantManager, zombies: any[], scene: DefaultScene): GameState {
+        const savedState: SavedGameState = JSON.parse(data);
+        const gameState = new GameState(gridState, player, plantManager, zombies, scene);
+        gameState.restoreState(savedState);
+        return gameState;
+    }
 
     // Save the current game state
     public saveState(): void {
@@ -98,7 +111,7 @@ export default class GameState {
     }
 
     // Get the current game state as a snapshot
-    private getCurrentState(): SavedGameState {
+    public getCurrentState(): SavedGameState {
         return {
             gridState: this.gridState.getRawState(),
             playerPosition: { x: this.player.position.x, y: this.player.position.y },
@@ -110,7 +123,7 @@ export default class GameState {
     }
 
     // Restore the game to a given state
-    private restoreState(state: SavedGameState): void {
+    public restoreState(state: SavedGameState): void {
         if (!state) return;
 
         // Restore grid state
