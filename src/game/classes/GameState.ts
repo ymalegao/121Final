@@ -38,6 +38,7 @@ export default class GameState {
     }
      // Serialize the game state for saving
      public serialize(): string {
+        console.log("in serialize")
         const currentState = this.getCurrentState();
         return JSON.stringify(currentState);
     }

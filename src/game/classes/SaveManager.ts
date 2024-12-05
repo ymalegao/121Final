@@ -6,6 +6,7 @@ import DefaultScene from '../scenes/DefaultScene';
 
 export class SaveManager {
     static saveGame(slotName: string, gameState: GameState): void {
+        console.log("in savegame")
         const serializedState = gameState.serialize();
         localStorage.setItem(`save_${slotName}`, serializedState);
         alert(`Game saved to slot: ${slotName}`);

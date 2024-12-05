@@ -7,6 +7,7 @@ import Player from '../classes/Player';
 import PlantManager from '../classes/PlantManager';
 import Zombie from '../classes/Zombie';
 import GameState from '../classes/GameState';
+import GridState from '../classes/GridState';
 
 export default class DefaultScene extends Phaser.Scene {
     
@@ -58,44 +59,59 @@ export default class DefaultScene extends Phaser.Scene {
         this.gameState = new GameState(this.gridManager.gridState, this.player, this.plantManager, this.zombies, this);
 
         // Player movement controls
-        this.input.keyboard.on('keydown', (event: { key: string }) => {
-            if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft'|| event.key === 'ArrowRight' ){
-                this.gameState.saveState();
-            }
-            if (event.key === 'ArrowUp') this.player.move('up') 
-            if (event.key === 'ArrowDown') this.player.move('down');
-            if (event.key === 'ArrowLeft') this.player.move('left');
-            if (event.key === 'ArrowRight') this.player.move('right');
-        });
+        if (this.input && this.input.keyboard) {
+            this.input.keyboard.on('keydown', (event: { key: string }) => {
+                if (event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'ArrowLeft'|| event.key === 'ArrowRight' ){
+                    this.gameState.saveState();
+                }
+                if (event.key === 'ArrowUp') this.player.move('up') 
+                if (event.key === 'ArrowDown') this.player.move('down');
+                if (event.key === 'ArrowLeft') this.player.move('left');
+                if (event.key === 'ArrowRight') this.player.move('right');
+            });
 
-        this.input.keyboard.on('keydown-Z', () => {
-            console.log("sun and water resource before undo: " + this.totalSun + " " + this.totalWater);
-            this.gameState.undo();
-            console.log("sun and water resource after undo: " + this.totalSun + " " + this.totalWater);
-        });
-        
-        this.input.keyboard.on('keydown-Y', () => {
+            this.input.keyboard.on('keydown-Z', () => {
+                console.log("sun and water resource before undo: " + this.totalSun + " " + this.totalWater);
+                this.gameState.undo();
+                console.log("sun and water resource after undo: " + this.totalSun + " " + this.totalWater);
+            });
             
-                this.gameState.redo();
-        });
+            this.input.keyboard.on('keydown-Y', () => {
+                
+                    this.gameState.redo();
+            });
 
-        // Place sunflower (commented out for now)
-        // this.input.keyboard.on('keydown-P', () => {
-        //     this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
-        //     //console.log(this.sunText);
-        // });
+            // Place sunflower (commented out for now)
+            // this.input.keyboard.on('keydown-P', () => {
+            //     this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
+            //     //console.log(this.sunText);
+            // });
 
-        //can you guide me through designing a system for an autonmous vechile
+            
 
-        // Progress turn -> Receive Sun and Water
-        this.input.keyboard.on('keydown-N', () => {
-            this.gameState.saveState(); // Save the current state
-            this.advanceTurn();
-        });
+            // Progress turn -> Receive Sun and Water
+            this.input.keyboard.on('keydown-N', () => {
+                this.gameState.saveState(); // Save the current state
+                this.advanceTurn();
+            });
+        }
 
         // Create UI elements for sun and water
         this.createResourceDisplay();
     }
+
+    // Method to get the current game state
+    public getGameState() {
+        console.log("water ", this.totalWater);
+        console.log(" state ", this.gameState);
+        this.gameState.getCurrentState();
+        console.log(" new state ", this.gameState);
+    }
+    // Method to load a saved game state
+    public loadGameState() {
+        this.gameState.restoreState();
+    }
+    
 
     private createResourceDisplay() {
         // Text for Sun and Water
@@ -147,9 +163,6 @@ export default class DefaultScene extends Phaser.Scene {
     //     console.log(could not reverse turn);
     // }
 
-    
-    
-    
 
     public updateResourceDisplay() {
         
@@ -285,15 +298,12 @@ export default class DefaultScene extends Phaser.Scene {
         ).setOrigin(0.5);
     
         // Restart game on "R" key press
-        const rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-        rKey.once('down', () => {
-            console.log('Restarting game...');
-            this.scene.restart(); // Restart the current scene
-        });
+        if (this.input && this.input.keyboard) {
+            const rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+                rKey.once('down', () => {
+                console.log('Restarting game...');
+                this.scene.restart(); // Restart the current scene
+            });
+        }
     }
-    
-    
-    
-    
-    
 }

@@ -58,6 +58,7 @@ import DefaultScene from './scenes/DefaultScene';
 export interface IRefPhaserGame {
     game: Phaser.Game | null;
     scene: Phaser.Scene | null;
+    getGameState: () => any | null;
 }
 
 export const PhaserGame = forwardRef<IRefPhaserGame>((_, ref) => { // Removed 'props' since it is not used
@@ -95,6 +96,8 @@ export const PhaserGame = forwardRef<IRefPhaserGame>((_, ref) => { // Removed 'p
     useImperativeHandle(ref, () => ({
         game,
         scene: currentScene,
+        getGameState() {
+        },
     }));
 
     return <div id="phaser-game"></div>;

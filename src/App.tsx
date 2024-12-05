@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { IRefPhaserGame, PhaserGame } from './game/PhaserGame';
-import { SaveManager } from './game/SaveManager'; // Adjust path as needed
-import GameState from './game/GameState';
+import { SaveManager } from './game/classes/SaveManager'; // Adjust path as needed
+import GameState from './game/classes/GameState';
 
 function App() {
     const phaserRef = useRef<IRefPhaserGame | null>(null);
