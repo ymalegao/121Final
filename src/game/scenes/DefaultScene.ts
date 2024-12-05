@@ -95,17 +95,18 @@ export default class DefaultScene extends Phaser.Scene {
     }
 
     // Method to get the current game state
+}
     public getGameState() {
         console.log("water ", this.totalWater);
         console.log(" state ", this.gameState);
-        this.gameState.getCurrentState();
+        this.gameState.saveState();
         console.log(" new state ", this.gameState);
     }
     // Method to load a saved game state
-    public loadGameState() {
-        this.gameState.restoreState();
-    }
-    
+    // public loadGameState() {
+    //     this.gameState.restoreState(this.gameState.undoStack.pop());
+    // }
+        
 
     private createResourceDisplay() {
         // Text for Sun and Water

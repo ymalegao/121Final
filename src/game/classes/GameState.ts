@@ -4,11 +4,12 @@ import PlantManager from './PlantManager';
 import Zombie from './Zombie';
 import ZombieManager from './ZombieManager';
 import DefaultScene from '../scenes/DefaultScene'; // Import the DefaultScene class
+import Plant from './Plant';
 
 export interface SavedGameState {
     gridState: Uint8Array; // Serialized GridState
     playerPosition: { x: number; y: number };
-    plants: any[]; // Array of plant objects with their states
+    plants: Plant[]; // Array of plant objects with their states
     zombies: Zombie[]; // Array of zombies with their states
     totalSun: number; // Total sunlight
     totalWater: number; // Total water
