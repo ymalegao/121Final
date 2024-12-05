@@ -5,7 +5,7 @@ import Phaser from 'phaser';
 import GridManager from '../classes/GridManager';
 import Player from '../classes/Player';
 import PlantManager from '../classes/PlantManager';
-import Zombie from '../classes/Zombie';
+import ZombieManager from '../classes/ZombieManager';
 import GameState from '../classes/GameState';
 
 export default class DefaultScene extends Phaser.Scene {
@@ -14,6 +14,7 @@ export default class DefaultScene extends Phaser.Scene {
     private isGameOver: boolean = false;
     private player: Player;
     private plantManager: PlantManager;
+    private zombieManager: ZombieManager;
     private sunText: Phaser.GameObjects.Text;
     private waterText: Phaser.GameObjects.Text;
     private sunBar: Phaser.GameObjects.Graphics;
@@ -23,6 +24,7 @@ export default class DefaultScene extends Phaser.Scene {
     private gameState: GameState;
     public totalSun: number;
     public totalWater: number;
+
  
 
     constructor() {
@@ -50,12 +52,12 @@ export default class DefaultScene extends Phaser.Scene {
         //let baseCostWater = 75;
 
         this.isGameOver = false; // Reset the game-over flag
-        this.zombies = []; // Clear the zombies array
 
         this.gridManager = new GridManager(this, cellSize, gridWidth, gridHeight);
         this.player = new Player(this, this.gridManager, 0, 0);
         this.plantManager = new PlantManager(this, this.gridManager);
-        this.gameState = new GameState(this.gridManager.gridState, this.player, this.plantManager, this.zombies, this);
+        this.zombieManager = new ZombieManager(this, this.gridManager);
+        this.gameState = new GameState(this.gridManager.gridState, this.player, this.plantManager, this.zombieManager, this);
 
         // Player movement controls
         this.input.keyboard.on('keydown', (event: { key: string }) => {
@@ -79,14 +81,7 @@ export default class DefaultScene extends Phaser.Scene {
                 this.gameState.redo();
         });
 
-        // Place sunflower (commented out for now)
-        // this.input.keyboard.on('keydown-P', () => {
-        //     this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
-        //     //console.log(this.sunText);
-        // });
-
-        //can you guide me through designing a system for an autonmous vechile
-
+       
         // Progress turn -> Receive Sun and Water
         this.input.keyboard.on('keydown-N', () => {
             this.gameState.saveState(); // Save the current state
@@ -123,20 +118,8 @@ export default class DefaultScene extends Phaser.Scene {
         // Update grid resources and plants
         this.gridManager.updateSunAndWaterLevels();
         this.plantManager.updatePlants();
+        this.zombieManager.updateZombies();
     
-        // Move all zombies
-        this.zombies.forEach((zombie) => {
-            zombie.move(); // Move the zombie forward
-            if (zombie.hasReachedEnd()) {
-                console.log('Zombie reached the end of the grid!');
-                this.gameOver(); // Trigger game over
-            }
-        });
-    
-        // Optionally spawn new zombies every turn or at intervals
-        if (Phaser.Math.Between(0, 1) === 1) {
-            this.spawnZombie();
-        }
     
         // Update UI resources
         this.updateResourceDisplay();
@@ -242,24 +225,12 @@ export default class DefaultScene extends Phaser.Scene {
         this.waterBar.fillStyle(0x1E90FF, 1); // Blue for water
         this.waterBar.fillRect(120, 34, 200 * waterPercentage, 20);
     }
-    private zombies: Zombie[] = []; // Array to store all zombies
-
-    // Spawn a new zombie
-    private spawnZombie(): void {
-        const gridX = this.gridManager.gridWidth - 1; // Spawn at the far-right column
-        const gridY = Phaser.Math.Between(0, this.gridManager.gridHeight - 1); // Random row
-        const zombie = new Zombie(this, gridX, gridY, 'Zombie'); // Use the correct texture key
-        this.zombies.push(zombie);
-        console.log(`Zombie spawned at (${gridX}, ${gridY})`);
-    }
+    
     public gameOver(): void {
         console.log('Game Over!');
         this.isGameOver = true; // Set the game-over flag
     
-        // Stop all zombies
-        this.zombies.forEach((zombie) => zombie.destroy());
-        this.zombies = []; // Clear all zombies
-    
+        this.zombieManager.destroyAllZombies(); // Destroy all zombies
         // Display "Game Over" message
         this.add.text(
             this.cameras.main.centerX,

@@ -5,15 +5,15 @@ interface IPlant {
     water: number; // Required water
     growthUnlocked: boolean; // Indicates if the plant can grow
     upgradeCost: number; // Cost to upgrade the plant
-    
 }
 
 export default class Plant implements IPlant {
     public i: number; // Grid row
     public j: number; // Grid column
-    protected scene: Phaser.Scene;
+    protected scene: Phaser.Scene | null;
     protected growthLevel: number;
-    public sprite: Phaser.GameObjects.Sprite;
+    public sprite: Phaser.GameObjects.Sprite | null;
+    public texture: string;
 
     public sunLight: number; // Required sunlight
     public water: number; // Required water
@@ -21,29 +21,45 @@ export default class Plant implements IPlant {
     public upgradeCost: number; // Upgrade cost for the plant
 
     constructor(
-        scene: Phaser.Scene,
+        scene: Phaser.Scene | null,
         gridX: number,
         gridY: number,
         texture: string,
         sunlight: number = 5, // Default sunlight requirement
         water: number = 5, // Default water requirement
-        upgradeCost: number = 10 // Default upgrade cost
+        upgradeCost: number = 10, // Default upgrade cost
+        growthLevel: number = 1 // Default growth level
     ) {
         this.scene = scene;
         this.i = gridX;
         this.j = gridY;
-        this.growthLevel = 1; // Start at level 1
+        this.growthLevel = growthLevel; // Start at level 1
         this.sunLight = sunlight;
         this.water = water;
         this.growthUnlocked = false;
         this.upgradeCost = upgradeCost;
+        this.texture = texture; 
 
-        const { x, y } = this.getWorldPosition(gridX, gridY);
-        this.sprite = this.scene.add.sprite(x, y, texture).setOrigin(0.5).setScale(0.5);
+        if (scene) {
+            const { x, y } = this.getWorldPosition(gridX, gridY);
+            this.sprite = this.scene?.add.sprite(x, y, texture).setOrigin(0.5).setScale(0.5 * this.growthLevel / 20) || null;
+        } else {
+            this.sprite = null; // No sprite if no scene provided
+        }
     }
 
-    getState() {
-        return { x: this.i, y: this.j, type: this.sprite };
+    public destroy(): void {
+        if (this.sprite) {
+            this.sprite.destroy();
+            this.sprite = null;
+            console.log(`Plant destroyed at (${this.i}, ${this.j})`);
+        }
+    }
+
+    public reAddToScene(scene: Phaser.Scene): void {
+        this.scene = scene;
+        const { x, y } = this.getWorldPosition(this.i, this.j);
+        this.sprite = this.scene.add.sprite(x, y, this.texture).setOrigin(0.5).setScale(0.5 * this.growthLevel / 20);
     }
 
     // Calculate the world position based on grid coordinates
@@ -55,33 +71,25 @@ export default class Plant implements IPlant {
         };
     }
 
-    // Check growth conditions based on sunlight and water
     public checkGrowthConditions(currentSunlight: number, currentWater: number): boolean {
-        if (currentSunlight >= this.sunLight && currentWater >= this.water) {
-            this.growthUnlocked = true;
-        } else {
-            this.growthUnlocked = false;
-        }
+        this.growthUnlocked = currentSunlight >= this.sunLight && currentWater >= this.water;
         return this.growthUnlocked;
     }
 
-    // Grow the plant
     public grow(): void {
         if (this.growthUnlocked) {
             this.growthLevel++;
-            this.sprite.setScale(0.5 * this.growthLevel / 20); // Increase size with growth
+            if (this.sprite) {
+                this.sprite.setScale(0.5 * this.growthLevel / 20); // Increase size with growth
+            }
         }
-    }
-
-    public getGrowthLevel(): number {
-        return this.growthLevel;
     }
 
     public applyAdjacentEffects(adjacentPlants: Plant[]): void {
         let sameTypeCount = 0;
 
         adjacentPlants.forEach((plant) => {
-            if (plant instanceof Plant && plant.constructor === this.constructor) {
+            if (plant.constructor === this.constructor) {
                 sameTypeCount++;
             }
         });
@@ -94,9 +102,6 @@ export default class Plant implements IPlant {
     }
 
     public clone(): Plant {
-        return new Plant(this.scene, this.i, this.j, 'plant', this.sunLight, this.water, this.upgradeCost);
+        return new Plant(null, this.i, this.j, this.texture, this.sunLight, this.water, this.upgradeCost, this.growthLevel);
     }
-
-    
-    
 }
