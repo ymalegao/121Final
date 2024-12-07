@@ -114,6 +114,36 @@ export default class DefaultScene extends Phaser.Scene {
       this.createResourceDisplay();
     }
 
+    this.input.keyboard.on('keydown-S', () => {
+        const slotName = prompt('Enter a save slot name:');
+        if (slotName) {
+          this.gameState.saveToSlot(`saveSlot-${slotName}`);
+        }
+      });
+  
+      // Load game from a slot
+      this.input.keyboard.on('keydown-L', () => {
+        const slotName = prompt('Enter a save slot name to load:');
+        if (slotName) {
+          const loadedState = GameState.loadFromSlot(
+            `saveSlot-${slotName}`,
+            this.gridManager.gridState,
+            this.player,
+            this.plantManager,
+            this.zombieManager,
+            this,
+          );
+          if (loadedState) {
+            this.gameState = loadedState;
+          }
+        }
+      });
+  
+      // List available slots
+      this.input.keyboard.on('keydown-B', () => {
+        console.log(GameState.getAvailableSaveSlots());
+      });
+
     // Method to get the current game state
   }
   public getGameState() {
