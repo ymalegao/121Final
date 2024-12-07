@@ -1,15 +1,12 @@
-  // F0.d Grid Cells have sun and water levels (Implementation)
-// Sun and Water indicator / feature or progress bar for growth
-
 import Phaser from 'phaser';
 import GridManager from '../classes/GridManager';
 import Player from '../classes/Player';
 import PlantManager from '../classes/PlantManager';
 import ZombieManager from '../classes/ZombieManager';
 import GameState from '../classes/GameState';
-import InputManager from './InputManager';
+// import InputManager from './InputManager';
+import { parseDSL, applyScenarioToGame } from '../../DSL/DSLParser';
 
-  
 export default class DefaultScene extends Phaser.Scene {
   public gridManager: GridManager;
   public isGameOver: boolean = false;
@@ -43,10 +40,11 @@ export default class DefaultScene extends Phaser.Scene {
     this.load.image('attackPlant', '../assets/attackPlant.png');
   }
 
-  create() {
+  async create() {
     const cellSize = 64;
     const gridWidth = 10;
     const gridHeight = 10;
+    const scenario = await parseDSL('./src/DSL/gameplayscenario.dsl')
     //let baseCostSun = 100;
     //let baseCostWater = 75;
 
@@ -64,7 +62,9 @@ export default class DefaultScene extends Phaser.Scene {
       this,
     );
 
-    
+    applyScenarioToGame(scenario, this.gameState, this.gridManager, this.plantManager, this.zombieManager);
+    console.log('Scenario applied properly', scenario);
+
 
     // Player movement controls
     if (this.input && this.input.keyboard) {

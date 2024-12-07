@@ -11,10 +11,18 @@ export default class InputManager {
 
     if (keyboard) {
       // Emit strictly typed direction events
-      keyboard.on('keydown-UP', () => scene.events.emit('playerMove', 'up' as Direction));
-      keyboard.on('keydown-DOWN', () => scene.events.emit('playerMove', 'down' as Direction));
-      keyboard.on('keydown-LEFT', () => scene.events.emit('playerMove', 'left' as Direction));
-      keyboard.on('keydown-RIGHT', () => scene.events.emit('playerMove', 'right' as Direction));
+      keyboard.on('keydown-UP', () =>
+        scene.events.emit('playerMove', 'up' as Direction),
+      );
+      keyboard.on('keydown-DOWN', () =>
+        scene.events.emit('playerMove', 'down' as Direction),
+      );
+      keyboard.on('keydown-LEFT', () =>
+        scene.events.emit('playerMove', 'left' as Direction),
+      );
+      keyboard.on('keydown-RIGHT', () =>
+        scene.events.emit('playerMove', 'right' as Direction),
+      );
 
       keyboard.on('keydown-N', () => scene.events.emit('advanceTurn'));
       keyboard.on('keydown-P', () => scene.events.emit('plantSun'));

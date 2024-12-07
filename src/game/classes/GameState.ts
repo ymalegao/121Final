@@ -23,6 +23,8 @@ export default class GameState {
   public undoStack: SavedGameState[] = [];
   public redoStack: SavedGameState[] = [];
   public scene: DefaultScene;
+  totalSun: number;
+  totalWater: number;
 
   constructor(
     gridState: GridState,
@@ -36,6 +38,8 @@ export default class GameState {
     this.plantManager = plantManager;
     this.zombieManager = zombieManager;
     this.scene = scene; // Assign the scene instance
+    this.totalSun = 0;
+    this.totalWater = 0;
   }
 
   // Serialize the current state

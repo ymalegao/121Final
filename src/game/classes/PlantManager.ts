@@ -15,7 +15,7 @@ export default class PlantManager {
   }
 
   // Add a plant to the grid
-  public plant(type: 'sun' | 'attack', gridX: number, gridY: number): void {
+  public plant(type: string, gridX: number, gridY: number): void {
     // Check if the position is valid and unoccupied
     if (
       !this.gridManager.isWithinBounds(gridX, gridY) ||

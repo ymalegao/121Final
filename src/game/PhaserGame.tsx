@@ -78,6 +78,8 @@ export const PhaserGame = forwardRef<IRefPhaserGame>((_, ref) => {
       type: Phaser.AUTO,
       width: 1024,
       height: 600,
+      // width: 800,
+      // height: 400,
       parent: 'phaser-game',
       backgroundColor: '#87CEEB',
       scene: [MenuScene, DefaultScene],
