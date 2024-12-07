@@ -88,3 +88,18 @@ Looking back on how we achieved the F0 requirements, our team’s plan changed s
 Additionally, we had to adapt our tools. Initially, we planned to host the game using a simple live server setup. However, due to the nature of the Phaser project and the React-based repo we cloned, we had to integrate Vite as a build tool. This required us to build the game using `npm run build` and deploy the `dist/index.html` to GitHub Pages. While this made the setup process more challenging, it allowed us to optimize the game for deployment.
 
 Overall, these adjustments helped us streamline development, focus on core mechanics, and meet the F0 requirements effectively while learning valuable lessons about game design and deployment.
+
+## Commands to install and run EsLint Linter and Prettier Code Formatter
+
+Run the two commands below to install the packages and dependencies: 
+`npm install -D eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-config-prettier prettier eslint-plugin-prettier`
+`npm install --save-dev --global prettier`
+
+To run the linter use this command: 
+`npx eslint .`
+
+To fix the errors in your code using the linter use this command: 
+`npx eslint --fix .`
+
+To run the code formatter use this command: 
+`npx prettier --write .`
