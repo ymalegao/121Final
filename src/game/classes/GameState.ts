@@ -67,6 +67,14 @@ export default class GameState {
     return gameState;
   }
 
+  public getGameState(): void {
+    console.log('water ', this.scene.totalWater);
+    console.log('state ', this.scene.gameState);
+    this.saveState();
+    console.log('new state ', this.scene.gameState.player);
+  }
+  
+
   // Save to a specific slot
   public saveToSlot(slotName: string): void {
     const serializedState = this.serialize();
@@ -179,4 +187,10 @@ zombies: this.zombieManager.zombies.map(z => ({ i: z.i, j: z.j })),
 
     console.log('Game state restored.');
   }
+
+  public autoSave(): void {
+    const serializedState = this.serialize();
+    localStorage.setItem("autoSaveSlot", serializedState);
+    console.log("Auto-saved game state.");
+    }
 }
