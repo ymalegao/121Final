@@ -11,6 +11,12 @@ body {
   overflow: hidden; /* Prevents body scrollbars */
 }
 
+#phaser-game {
+  width: 100%; /* Make sure it fills its parent */
+  height: 100%; /* Same for height */
+  background-color: transparent; /* Optional: override background */
+}
+
 #app {
   width: 100%;
   height: 100vh;
