@@ -104,7 +104,7 @@ To fix the errors in your code using the linter use this command:
 To run the code formatter use this command: 
 `npx prettier --write .`
 
-# F1 Devlog 
+# F1 Devlog - [12/06/2024]
 
 ## F1.a: The important state of your game's grid must be backed by a single contiguous byte array in AoS or SoA format.
 
@@ -158,4 +158,3 @@ Undo/redo and on-screen notifications (e.g., "Planted a Sunflower at [3, 2]") im
 
 ### Cross-Module Collaboration:
 The modular design ensured seamless integration across files like `GridManager.ts`, `PlantManager.ts`, and `GameState.ts`. This structure allowed efficient implementation of requirements like F1.b and F1.c without duplication of effort.
-
