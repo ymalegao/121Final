@@ -7,10 +7,10 @@ import DefaultScene from '../scenes/DefaultScene'; // Import the DefaultScene cl
 import Plant from './Plant';
 
 export interface SavedGameState {
-  gridState: Uint8Array; // Serialized GridState
+  gridState: number[] // Serialized GridState
   playerPosition: { x: number; y: number };
   plants: Plant[]; // Array of plant objects with their states
-  zombies: Zombie[]; // Array of zombies with their states
+  zombies: { i: number; j: number }[];
   totalSun: number; // Total sunlight
   totalWater: number; // Total water
 }
@@ -38,6 +38,7 @@ export default class GameState {
     this.scene = scene; // Assign the scene instance
   }
 
+  // Serialize the current state
   public serialize(): string {
     const currentState = this.getCurrentState();
     return JSON.stringify(currentState);
@@ -53,6 +54,7 @@ export default class GameState {
     scene: DefaultScene,
   ): GameState {
     const savedState: SavedGameState = JSON.parse(data);
+    console.log("saved state is ", savedState);
     const gameState = new GameState(
       gridState,
       player,
@@ -60,66 +62,73 @@ export default class GameState {
       zombieManager,
       scene,
     );
+    
     gameState.restoreState(savedState);
     return gameState;
   }
 
-  // Save the current game state
-  public saveState(): void {
-    const gameState: SavedGameState = {
-      gridState: this.gridState.getRawState(),
-      playerPosition: { x: this.player.position.x, y: this.player.position.y },
-      plants: this.plantManager.plants.map((plant) => plant.clone()),
-      zombies: this.zombieManager.zombies.map((zombie) => zombie.clone()),
-      totalSun: this.scene.totalSun,
-      totalWater: this.scene.totalWater,
-    };
+  public getGameState(): void {
+    console.log('water ', this.scene.totalWater);
+    console.log('state ', this.scene.gameState);
+    this.saveState();
+    console.log('new state ', this.scene.gameState.player);
+  }
+  
 
-    this.undoStack.push(gameState);
-    this.redoStack = [];
-    console.log('Game state saved.');
+  // Save to a specific slot
+  public saveToSlot(slotName: string): void {
+    const serializedState = this.serialize();
+    localStorage.setItem(slotName, serializedState);
+    console.log(`Game saved to slot: ${slotName}`);
   }
 
-  // Restore the game to a given state
-  public restoreState(state: SavedGameState): void {
-    if (!state) return;
+  // Load from a specific slot
+  public static loadFromSlot(
+    slotName: string,
+    gridState: GridState,
+    player: Player,
+    plantManager: PlantManager,
+    zombieManager: ZombieManager,
+    scene: DefaultScene,
+  ): GameState | null {
+    const serializedState = localStorage.getItem(slotName);
+    if (!serializedState) {
+      console.log(`No save data found in slot: ${slotName}`);
+      return null;
+    }
+    console.log(`Game loaded from slot: ${slotName}`);
+    return GameState.deserialize(
+      serializedState,
+      gridState,
+      player,
+      plantManager,
+      zombieManager,
+      scene,
+    );
+  }
 
-    // Restore grid state
-    this.gridState.loadRawState(state.gridState);
+  // List available save slots
+  public static getAvailableSaveSlots(): string[] {
+    return Object.keys(localStorage).filter((key) => key.startsWith('saveSlot-'));
+  }
 
-    // Restore player position
-    this.player.setPosition(state.playerPosition.x, state.playerPosition.y);
-
-    // Destroy existing plants and zombies
-    this.plantManager.destroyAllPlants();
-    this.zombieManager.destroyAllZombies();
-
-    // Restore plants
-    this.plantManager.plants = state.plants.map((plantClone) => {
-      plantClone.reAddToScene(this.scene);
-      return plantClone;
-    });
-
-    // Restore zombies
-    this.zombieManager.zombies = state.zombies.map((zombieClone) => {
-      zombieClone.reAddToScene(this.scene);
-      return zombieClone;
-    });
-
-    // Restore resources
-    this.scene.totalSun = state.totalSun;
-    this.scene.totalWater = state.totalWater;
-    this.scene.updateSunAndWaterUI(this.scene.totalSun, this.scene.totalWater);
-
-    console.log('Game state restored.');
+  // Save the current game state
+  public saveState(): void {
+    const gameState: SavedGameState = this.getCurrentState();
+    this.undoStack.push(gameState);
+    this.redoStack = []; // Clear redo stack after a new save
+    console.log('Game state saved.');
   }
 
   // Undo the last action
   public undo(): void {
-    if (this.undoStack.length > 0) {
+    if (this.undoStack.length > 1) { // Always leave one state for fallback
       const lastState = this.undoStack.pop();
       this.redoStack.push(lastState as SavedGameState);
       this.restoreState(this.undoStack[this.undoStack.length - 1]);
+      console.log('Undo successful.');
+    } else {
+      console.log('No more undos available.');
     }
   }
 
@@ -129,17 +138,59 @@ export default class GameState {
       const lastState = this.redoStack.pop();
       this.undoStack.push(lastState as SavedGameState);
       this.restoreState(lastState as SavedGameState);
+      console.log('Redo successful.');
+    } else {
+      console.log('No more redos available.');
     }
   }
+
   // Get the current game state as a snapshot
   public getCurrentState(): SavedGameState {
     return {
-      gridState: this.gridState.getRawState(),
+      gridState: Array.from(this.gridState.getRawState()),
       playerPosition: { x: this.player.position.x, y: this.player.position.y },
       plants: this.plantManager.plants.map((plant) => plant.clone()),
-      zombies: this.zombieManager.zombies.map((zombie) => zombie.clone()),
+zombies: this.zombieManager.zombies.map(z => ({ i: z.i, j: z.j })),
       totalSun: this.scene.totalSun,
       totalWater: this.scene.totalWater,
     };
   }
+
+  // Restore the game to a given state
+  public restoreState(state: SavedGameState): void {
+    if (!state) return;
+
+    console.log('Restoring game state...');
+    //find type of state.gridState
+    console.log('Current state:', state.gridState.constructor.name);
+    console.log('Current state:', state.gridState);   
+    const uint8 = new Uint8Array(state.gridState); 
+    this.gridState.loadRawState(uint8);
+    this.player.setPosition(state.playerPosition.x, state.playerPosition.y);
+
+    this.plantManager.destroyAllPlants();
+    this.zombieManager.destroyAllZombies();
+
+    this.plantManager.plants = state.plants.map((plantClone) => {
+      plantClone.reAddToScene(this.scene);
+      return plantClone;
+    });
+
+    this.zombieManager.zombies = state.zombies.map(zData => {
+        const newZombie = new Zombie(this.scene, zData.i, zData.j, 'Zombie');
+        return newZombie;
+      });
+
+    this.scene.totalSun = state.totalSun;
+    this.scene.totalWater = state.totalWater;
+    this.scene.updateSunAndWaterUI(this.scene.totalSun, this.scene.totalWater);
+
+    console.log('Game state restored.');
+  }
+
+  public autoSave(): void {
+    const serializedState = this.serialize();
+    localStorage.setItem("autoSaveSlot", serializedState);
+    console.log("Auto-saved game state.");
+    }
 }

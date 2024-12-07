@@ -1,4 +1,4 @@
-// F0.d Grid Cells have sun and water levels (Implementation)
+  // F0.d Grid Cells have sun and water levels (Implementation)
 // Sun and Water indicator / feature or progress bar for growth
 
 import Phaser from 'phaser';
@@ -7,8 +7,9 @@ import Player from '../classes/Player';
 import PlantManager from '../classes/PlantManager';
 import ZombieManager from '../classes/ZombieManager';
 import GameState from '../classes/GameState';
-import GridState from '../classes/GridState';
+import InputManager from './InputManager';
 
+  
 export default class DefaultScene extends Phaser.Scene {
   public gridManager: GridManager;
   public isGameOver: boolean = false;
@@ -63,6 +64,8 @@ export default class DefaultScene extends Phaser.Scene {
       this,
     );
 
+    
+
     // Player movement controls
     if (this.input && this.input.keyboard) {
       this.input.keyboard.on('keydown', (event: { key: string }) => {
@@ -104,6 +107,7 @@ export default class DefaultScene extends Phaser.Scene {
       this.input.keyboard.on('keydown-N', () => {
         this.gameState.saveState(); // Save the current state
         this.advanceTurn();
+        this.gameState.autoSave();
         console.log('water ', this.totalWater);
         console.log(' state ', this.gameState);
         this.gameState.saveState();
@@ -114,14 +118,63 @@ export default class DefaultScene extends Phaser.Scene {
       this.createResourceDisplay();
     }
 
+    const autoSaveExists = localStorage.getItem("autoSaveSlot") !== null;
+        console.log("Auto-save exists: ", autoSaveExists);
+    if (autoSaveExists) {
+        const continueGame = confirm("An auto-save is available. Continue where you left off?");
+        if (continueGame) {
+            const loadedState = GameState.loadFromSlot(
+                "autoSaveSlot",
+                this.gridManager.gridState,
+                this.player,
+                this.plantManager,
+                this.zombieManager,
+                this,
+            );
+            if (loadedState) {
+                this.gameState = loadedState;
+            }
+        } else {
+            // Start fresh: do nothing or initialize a new GameState as normal.
+        }
+    } else {
+        // No auto-save available, just start fresh as usual.
+    }
+
+
+    this.input.keyboard.on('keydown-S', () => {
+        const slotName = prompt('Enter a save slot name:');
+        if (slotName) {
+          this.gameState.saveToSlot(`saveSlot-${slotName}`);
+        }
+      });
+  
+      // Load game from a slot
+      this.input.keyboard.on('keydown-L', () => {
+        const slotName = prompt('Enter a save slot name to load:');
+        if (slotName) {
+          const loadedState = GameState.loadFromSlot(
+            `saveSlot-${slotName}`,
+            this.gridManager.gridState,
+            this.player,
+            this.plantManager,
+            this.zombieManager,
+            this,
+          );
+          if (loadedState) {
+            this.gameState = loadedState;
+          }
+        }
+      });
+  
+      // List available slots
+      this.input.keyboard.on('keydown-B', () => {
+        console.log(GameState.getAvailableSaveSlots());
+      });
+
     // Method to get the current game state
   }
-  public getGameState() {
-    console.log('water ', this.totalWater);
-    console.log(' state ', this.gameState);
-    this.gameState.saveState();
-    console.log(' new state ', this.gameState.player);
-  }
+  
   // Method to load a saved game state
   // public loadGameState() {
   //     this.gameState.restoreState(this.gameState.undoStack.pop());
@@ -249,6 +302,8 @@ export default class DefaultScene extends Phaser.Scene {
   // Helper method to update both sun and water UI components
   public updateSunAndWaterUI(totalSun: number, totalWater: number): void {
     // Update the text displays
+
+    console.log('sun and water resource: ' + totalSun + ' ' + totalWater);
     if (this.totalSun == undefined || this.totalWater == undefined) {
       totalSun = 0;
       totalWater = 0;
