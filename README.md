@@ -103,3 +103,59 @@ To fix the errors in your code using the linter use this command:
 
 To run the code formatter use this command: 
 `npx prettier --write .`
+
+# F1 Devlog 
+
+## F1.a: The important state of your game's grid must be backed by a single contiguous byte array in AoS or SoA format.
+
+**Implementation:**  
+The grid state is managed in the `GridState.ts` and `GridManager.ts` files.  
+The game uses a Structure of Arrays (SoA) format where each property (e.g., plant type, growth level, sun level, water level) is stored as a separate array. This ensures efficient memory access and allows updates without redundant data copying.  
+For example, an array `gridCells` is indexed such that `gridCells[i]` corresponds to the state of the i-th cell.  
+
+**Diagram:**  
+Here is a visualization of this memory layout showing the separate arrays for different properties aligned by indices.
+
+![Memory Layout Diagram](./public/Memory%20Layout%20Diagram.png)
+
+## F1.b: The player must be able to manually save their progress in the game.
+
+**Implementation:**  
+The manual save/load functionality is handled through `GameState.ts` and integrated with `GridState.ts` to persist the grid layout, player position, plant data, and other game parameters.  
+Save files are serialized as JSON objects and stored in local storage. The player can manage multiple save files through a menu implemented in `MenuScene.ts`.
+
+**UI Design:**  
+The `MenuScene.ts` file provides a list of save slots and options to save or load progress. Slots are labeled for user clarity (e.g., "Slot 1: Day 3, Turn 5").
+
+## F1.c: The game must implement an implicit auto-save system to support recovery from unexpected quits.
+
+**Implementation:**  
+The auto-save system is integrated within `GameState.ts`. After every significant action (e.g., advancing turns, planting, combat), the current state is auto-saved to a separate slot in local storage.  
+Upon launching the game, `MenuScene.ts` checks for the presence of an auto-save file. If found, the game prompts the player with:  
+*"Do you want to continue from where you left off?"*  
+Auto-save does not interfere with manual save slots, maintaining clear separation for user-controlled saves.
+
+## F1.d: The player must be able to undo every major choice.
+
+**Implementation:**  
+- **Undo Stack:** In `GameState.ts`, each significant action (e.g., planting, advancing turns, moving) creates a snapshot of the grid and player state. These snapshots are stored in an undo stack.  
+- **Redo Stack:** When an undo is performed, the previous state is saved in a redo stack. This allows redoing undone actions as needed.  
+- **Modules Involved:** The `Player.ts` and `GridManager.ts` files are responsible for handling undoable actions related to player movements and grid interactions, respectively.  
+- **UI Feedback:** Undo/redo buttons are prominently displayed on the game UI, implemented in `MenuScene.ts`.
+
+## Reflection
+
+### Looking back on how we achieved the F1 requirements:
+
+### Evolving the Save/Load System:
+Initially, manual saving was considered sufficient, but playtesting revealed the importance of auto-save and recovery features. Integrating these features in `GameState.ts` added robustness and improved user experience.
+
+### Memory Management Challenges:
+Representing the grid state in a Structure of Arrays (SoA) format required careful synchronization between arrays. For example, updating a cell’s sun level required ensuring consistency with water levels and plant data in other arrays.
+
+### Player Feedback:
+Undo/redo and on-screen notifications (e.g., "Planted a Sunflower at [3, 2]") improved player understanding. These features were developed iteratively, based on playtesting feedback.
+
+### Cross-Module Collaboration:
+The modular design ensured seamless integration across files like `GridManager.ts`, `PlantManager.ts`, and `GameState.ts`. This structure allowed efficient implementation of requirements like F1.b and F1.c without duplication of effort.
+
