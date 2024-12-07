@@ -13,11 +13,20 @@ export default class ZombieManager {
   }
 
   public spawnZombie(): void {
-    const gridX = this.gridManager.gridWidth - 1; // Spawn at the far-right column
+    const gridX = this.gridManager.gridWidth + 4.5; // Set to the far-right column of the grid
     const gridY = Phaser.Math.Between(0, this.gridManager.gridHeight - 1); // Random row
     const zombie = new Zombie(this.scene, gridX, gridY, 'Zombie'); // Use the correct texture key
+
+    // Adjust the zombie's world position to align with the far-right column of the grid
+    if (zombie.sprite) {
+      const { x, y } = zombie.getWorldPosition(gridX, gridY);
+      zombie.sprite.setPosition(x, y); // Set position to grid-aligned coordinates
+    }
+
     this.zombies.push(zombie);
-    console.log(`Zombie spawned at (${gridX}, ${gridY})`);
+    console.log(
+      `Zombie spawned at grid position (${gridX}, ${gridY}) - far-right column`,
+    );
   }
 
   // Get zombie at specific grid coordinates

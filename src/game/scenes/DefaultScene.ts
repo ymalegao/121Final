@@ -42,11 +42,9 @@ export default class DefaultScene extends Phaser.Scene {
 
   async create() {
     const cellSize = 64;
-    const gridWidth = 10;
-    const gridHeight = 10;
-    const scenario = await parseDSL('./src/DSL/gameplayscenario.dsl')
-    //let baseCostSun = 100;
-    //let baseCostWater = 75;
+    const gridWidth = 16;
+    const gridHeight = 16;
+    const scenario = await parseDSL('./src/DSL/gameplayscenario.dsl');
 
     this.isGameOver = false; // Reset the game-over flag
 
@@ -62,9 +60,14 @@ export default class DefaultScene extends Phaser.Scene {
       this,
     );
 
-    applyScenarioToGame(scenario, this.gameState, this.gridManager, this.plantManager, this.zombieManager);
+    applyScenarioToGame(
+      scenario,
+      this.gameState,
+      this.gridManager,
+      this.plantManager,
+      this.zombieManager,
+    );
     console.log('Scenario applied properly', scenario);
-
 
     // Player movement controls
     if (this.input && this.input.keyboard) {
@@ -118,67 +121,63 @@ export default class DefaultScene extends Phaser.Scene {
       this.createResourceDisplay();
     }
 
-    const autoSaveExists = localStorage.getItem("autoSaveSlot") !== null;
-        console.log("Auto-save exists: ", autoSaveExists);
+    const autoSaveExists = localStorage.getItem('autoSaveSlot') !== null;
+    console.log('Auto-save exists: ', autoSaveExists);
     if (autoSaveExists) {
-        const continueGame = confirm("An auto-save is available. Continue where you left off?");
-        if (continueGame) {
-            const loadedState = GameState.loadFromSlot(
-                "autoSaveSlot",
-                this.gridManager.gridState,
-                this.player,
-                this.plantManager,
-                this.zombieManager,
-                this,
-            );
-            if (loadedState) {
-                this.gameState = loadedState;
-            }
-        } else {
-            // Start fresh: do nothing or initialize a new GameState as normal.
+      const continueGame = confirm(
+        'An auto-save is available. Continue where you left off?',
+      );
+      if (continueGame) {
+        const loadedState = GameState.loadFromSlot(
+          'autoSaveSlot',
+          this.gridManager.gridState,
+          this.player,
+          this.plantManager,
+          this.zombieManager,
+          this,
+        );
+        if (loadedState) {
+          this.gameState = loadedState;
         }
+      } else {
+        // Start fresh: do nothing or initialize a new GameState as normal.
+      }
     } else {
-        // No auto-save available, just start fresh as usual.
+      // No auto-save available, just start fresh as usual.
     }
 
-
     this.input.keyboard.on('keydown-S', () => {
-        const slotName = prompt('Enter a save slot name:');
-        if (slotName) {
-          this.gameState.saveToSlot(`saveSlot-${slotName}`);
+      const slotName = prompt('Enter a save slot name:');
+      if (slotName) {
+        this.gameState.saveToSlot(`saveSlot-${slotName}`);
+      }
+    });
+
+    // Load game from a slot
+    this.input.keyboard.on('keydown-L', () => {
+      const slotName = prompt('Enter a save slot name to load:');
+      if (slotName) {
+        const loadedState = GameState.loadFromSlot(
+          `saveSlot-${slotName}`,
+          this.gridManager.gridState,
+          this.player,
+          this.plantManager,
+          this.zombieManager,
+          this,
+        );
+        if (loadedState) {
+          this.gameState = loadedState;
         }
-      });
-  
-      // Load game from a slot
-      this.input.keyboard.on('keydown-L', () => {
-        const slotName = prompt('Enter a save slot name to load:');
-        if (slotName) {
-          const loadedState = GameState.loadFromSlot(
-            `saveSlot-${slotName}`,
-            this.gridManager.gridState,
-            this.player,
-            this.plantManager,
-            this.zombieManager,
-            this,
-          );
-          if (loadedState) {
-            this.gameState = loadedState;
-          }
-        }
-      });
-  
-      // List available slots
-      this.input.keyboard.on('keydown-B', () => {
-        console.log(GameState.getAvailableSaveSlots());
-      });
+      }
+    });
+
+    // List available slots
+    this.input.keyboard.on('keydown-B', () => {
+      console.log(GameState.getAvailableSaveSlots());
+    });
 
     // Method to get the current game state
   }
-  
-  // Method to load a saved game state
-  // public loadGameState() {
-  //     this.gameState.restoreState(this.gameState.undoStack.pop());
-  // }
 
   private createResourceDisplay() {
     // Text for Sun and Water
@@ -218,11 +217,6 @@ export default class DefaultScene extends Phaser.Scene {
     this.updateResourceDisplay();
   }
 
-  //reverse turn
-  // private reverseTurn(): void {
-  //     console.log(could not reverse turn);
-  // }
-
   public updateResourceDisplay() {
     // Sum up the sun and water values for all cells
     for (let y = 0; y < this.gridManager.gridHeight; y++) {
@@ -242,60 +236,90 @@ export default class DefaultScene extends Phaser.Scene {
     document.addEventListener('keydown', (event) => {
       if (event.key === 'P' || event.key === 'p') {
         // Check if 'P' (or lowercase 'p') is pressed
-        if (this.totalSun >= 100 && this.totalWater >= 75) {
+
+        // Check if the player is on an even tile (both x and y are even)
+        if (
+          this.player.position.x % 2 === 0 &&
+          this.player.position.y % 2 === 0
+        ) {
           // Ensure sufficient resources
-          if (
-            this.plantManager.getAdjacentPlants(
+          if (this.totalSun >= 100 && this.totalWater >= 75) {
+            // Check if there are adjacent plants
+            if (
+              this.plantManager.getAdjacentPlants(
+                this.player.position.x,
+                this.player.position.y,
+              ).length > 0
+            ) {
+              // Discount for adjacency
+              this.totalSun -= this.baseCostSun * 0.5;
+              this.totalWater -= this.baseCostWater * 0.5;
+              this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+            } else {
+              this.totalSun -= this.baseCostSun;
+              this.totalWater -= this.baseCostWater;
+              this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+            }
+
+            // Plant the "sun" plant at the player’s position
+            this.plantManager.plant(
+              'sun',
               this.player.position.x,
               this.player.position.y,
-            ).length > 0
-          ) {
-            // changed to > 0, used to be == 1
-            // Discount for adjacency
-            this.totalSun -= this.baseCostSun * 0.5;
-            this.totalWater -= this.baseCostWater * 0.5;
-            this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+            );
+            this.gridManager.sunPlants += 1;
           } else {
-            this.totalSun -= this.baseCostSun;
-            this.totalWater -= this.baseCostWater;
-            this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+            console.log('Not enough resources to plant!');
           }
-          this.plantManager.plant(
-            'sun',
-            this.player.position.x,
-            this.player.position.y,
-          );
-          this.gridManager.sunPlants += 1;
         } else {
-          console.log('Not enough resources to plant!');
+          console.log('Plant can only be placed on even tiles!');
         }
       }
 
-      if (event.key === 'A' || event.key === 'a') {
-        // plant attack plant
-        if (this.totalSun >= 100 && this.totalWater >= 75) {
-          // check if enough resources
-          if (
-            this.plantManager.getAdjacentPlants(
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'A' || event.key === 'a') {
+          // Check if the player has enough resources
+          if (this.totalSun >= 100 && this.totalWater >= 75) {
+            // Get adjacent plants to the current position
+            const adjacentPlants = this.plantManager.getAdjacentPlants(
               this.player.position.x,
               this.player.position.y,
-            ).length > 0
-          ) {
-            this.totalSun -= this.baseCostSun * 0.5; // discount for adjacent positioning
-            this.totalWater -= this.baseCostWater * 0.5;
-            this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+            );
+
+            // Check if any adjacent plant is an attack plant
+            const isAdjacentToAttackPlant = adjacentPlants.some(
+              (plant) => plant.type === 'attack',
+            );
+
+            if (isAdjacentToAttackPlant) {
+              console.log(
+                'Cannot plant attack plant next to another attack plant!',
+              );
+              return; // Prevent planting if adjacent to another attack plant
+            }
+
+            // Apply resource discount if there are other plants nearby
+            if (adjacentPlants.length > 0) {
+              this.totalSun -= this.baseCostSun * 0.5; // Discount for adjacent positioning
+              this.totalWater -= this.baseCostWater * 0.5;
+              this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+            } else {
+              this.totalSun -= this.baseCostSun;
+              this.totalWater -= this.baseCostWater;
+              this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+            }
+
+            // Place the attack plant
+            this.plantManager.plant(
+              'attack',
+              this.player.position.x,
+              this.player.position.y,
+            );
           } else {
-            this.totalSun -= this.baseCostSun;
-            this.totalWater -= this.baseCostWater;
-            this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+            console.log('Not enough resources to plant attack plant!');
           }
-          this.plantManager.plant(
-            'attack',
-            this.player.position.x,
-            this.player.position.y,
-          );
         }
-      }
+      });
     });
   }
 

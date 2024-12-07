@@ -43,8 +43,12 @@ export default class GridManager {
             y * this.cellSize + this.cellSize / 2,
             this.cellSize - 2,
             this.cellSize - 2,
-            0xcccccc, // Light grey
+            0xcccccc, // Light grey (default color)
+
+            // Check if the tile is even (both x and y are even), then change the color to brown
+            x % 2 === 0 && y % 2 === 0 ? 0xe6a165 : 0xcccccc, // Brown for even tiles, light grey for others
           )
+
           .setOrigin(0.5);
         this.cells[y][x] = cell;
 

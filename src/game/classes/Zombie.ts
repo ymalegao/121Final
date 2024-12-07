@@ -74,7 +74,7 @@ export default class Zombie {
   }
 
   // Get world position from grid coordinates
-  private getWorldPosition(
+  public getWorldPosition(
     gridX: number,
     gridY: number,
   ): { x: number; y: number } {

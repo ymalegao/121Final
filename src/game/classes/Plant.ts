@@ -5,6 +5,7 @@ interface IPlant {
   water: number; // Required water
   growthUnlocked: boolean; // Indicates if the plant can grow
   upgradeCost: number; // Cost to upgrade the plant
+  type: string;
 }
 
 export default class Plant implements IPlant {
@@ -19,6 +20,7 @@ export default class Plant implements IPlant {
   public water: number; // Required water
   public growthUnlocked: boolean; // Can the plant grow
   public upgradeCost: number; // Upgrade cost for the plant
+  public type: string; // Add the 'type' property
 
   constructor(
     scene: Phaser.Scene | null,

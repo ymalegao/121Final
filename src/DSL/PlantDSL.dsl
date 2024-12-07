@@ -3,12 +3,14 @@ PLANT_TYPES:
       GROWTH_CONDITION:
         - REQUIRES_MIN_SUNLIGHT 100
         - REQUIRES_MIN_WATER 100
+        - REQUIRES_TILE_EVEN true
       ABILITY: "generate_sun"
 
   - TYPE "attack":
       GROWTH_CONDITION:
         - REQUIRES_MIN_SUNLIGHT 100
         - REQUIRES_MIN_WATER 100
+        - REQUIRES_NON_ADJACENT true
       ABILITY: "attack"
 
 PLANT_ACTIONS:

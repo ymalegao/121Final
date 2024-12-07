@@ -7,7 +7,7 @@ import DefaultScene from '../scenes/DefaultScene'; // Import the DefaultScene cl
 import Plant from './Plant';
 
 export interface SavedGameState {
-  gridState: number[] // Serialized GridState
+  gridState: number[]; // Serialized GridState
   playerPosition: { x: number; y: number };
   plants: Plant[]; // Array of plant objects with their states
   zombies: { i: number; j: number }[];
@@ -58,7 +58,7 @@ export default class GameState {
     scene: DefaultScene,
   ): GameState {
     const savedState: SavedGameState = JSON.parse(data);
-    console.log("saved state is ", savedState);
+    console.log('saved state is ', savedState);
     const gameState = new GameState(
       gridState,
       player,
@@ -66,7 +66,7 @@ export default class GameState {
       zombieManager,
       scene,
     );
-    
+
     gameState.restoreState(savedState);
     return gameState;
   }
@@ -77,7 +77,6 @@ export default class GameState {
     this.saveState();
     console.log('new state ', this.scene.gameState.player);
   }
-  
 
   // Save to a specific slot
   public saveToSlot(slotName: string): void {
@@ -113,7 +112,9 @@ export default class GameState {
 
   // List available save slots
   public static getAvailableSaveSlots(): string[] {
-    return Object.keys(localStorage).filter((key) => key.startsWith('saveSlot-'));
+    return Object.keys(localStorage).filter((key) =>
+      key.startsWith('saveSlot-'),
+    );
   }
 
   // Save the current game state
@@ -126,7 +127,8 @@ export default class GameState {
 
   // Undo the last action
   public undo(): void {
-    if (this.undoStack.length > 1) { // Always leave one state for fallback
+    if (this.undoStack.length > 1) {
+      // Always leave one state for fallback
       const lastState = this.undoStack.pop();
       this.redoStack.push(lastState as SavedGameState);
       this.restoreState(this.undoStack[this.undoStack.length - 1]);
@@ -154,7 +156,7 @@ export default class GameState {
       gridState: Array.from(this.gridState.getRawState()),
       playerPosition: { x: this.player.position.x, y: this.player.position.y },
       plants: this.plantManager.plants.map((plant) => plant.clone()),
-zombies: this.zombieManager.zombies.map(z => ({ i: z.i, j: z.j })),
+      zombies: this.zombieManager.zombies.map((z) => ({ i: z.i, j: z.j })),
       totalSun: this.scene.totalSun,
       totalWater: this.scene.totalWater,
     };
@@ -167,8 +169,8 @@ zombies: this.zombieManager.zombies.map(z => ({ i: z.i, j: z.j })),
     console.log('Restoring game state...');
     //find type of state.gridState
     console.log('Current state:', state.gridState.constructor.name);
-    console.log('Current state:', state.gridState);   
-    const uint8 = new Uint8Array(state.gridState); 
+    console.log('Current state:', state.gridState);
+    const uint8 = new Uint8Array(state.gridState);
     this.gridState.loadRawState(uint8);
     this.player.setPosition(state.playerPosition.x, state.playerPosition.y);
 
@@ -180,10 +182,10 @@ zombies: this.zombieManager.zombies.map(z => ({ i: z.i, j: z.j })),
       return plantClone;
     });
 
-    this.zombieManager.zombies = state.zombies.map(zData => {
-        const newZombie = new Zombie(this.scene, zData.i, zData.j, 'Zombie');
-        return newZombie;
-      });
+    this.zombieManager.zombies = state.zombies.map((zData) => {
+      const newZombie = new Zombie(this.scene, zData.i, zData.j, 'Zombie');
+      return newZombie;
+    });
 
     this.scene.totalSun = state.totalSun;
     this.scene.totalWater = state.totalWater;
@@ -194,7 +196,7 @@ zombies: this.zombieManager.zombies.map(z => ({ i: z.i, j: z.j })),
 
   public autoSave(): void {
     const serializedState = this.serialize();
-    localStorage.setItem("autoSaveSlot", serializedState);
-    console.log("Auto-saved game state.");
-    }
+    localStorage.setItem('autoSaveSlot', serializedState);
+    console.log('Auto-saved game state.');
+  }
 }

@@ -10,25 +10,21 @@ interface Scenario {
   startWater: number;
   plants: {
     type: string;
-    x: number;  
+    x: number;
     y: number;
     growthCondition: string[];
     ability: string;
-  }[]; 
+  }[];
   zombies: { spawnRate: number; initialSpawns: { x: number; y: number }[] };
   defeat: string;
-  events: { turn: number; action: string; params: Record<string, any> }[]; 
+  events: { turn: number; action: string; params: Record<string, any> }[];
 }
-
-
-
-
 
 export async function parseDSL(fileUrl: string): Promise<Scenario> {
   const response = await fetch(fileUrl); // Fetch the file using fetch API
-  const content = await response.text();  // Read the file content as text
+  const content = await response.text(); // Read the file content as text
   const lines = content.split('\n').map((line) => line.trim());
-  
+
   const scenario: Partial<Scenario> = {
     plants: [],
     zombies: { spawnRate: 0, initialSpawns: [] },
@@ -109,13 +105,13 @@ export async function parseDSL(fileUrl: string): Promise<Scenario> {
       default:
         if (currentPlant.type) {
           scenario.plants!.push({
-            type: currentPlant.type ?? 'unknown', 
-            x: 0, 
-            y: 0, 
-            growthCondition: currentPlant.growthCondition ?? [], 
+            type: currentPlant.type ?? 'unknown',
+            x: 0,
+            y: 0,
+            growthCondition: currentPlant.growthCondition ?? [],
             ability: currentPlant.ability ?? 'none',
           });
-          currentPlant = {}; 
+          currentPlant = {};
         }
     }
 
@@ -127,7 +123,7 @@ export async function parseDSL(fileUrl: string): Promise<Scenario> {
         growthCondition: currentPlant.growthCondition ?? [],
         ability: currentPlant.ability ?? 'none',
       });
-      currentPlant = {}; 
+      currentPlant = {};
     }
   });
 
@@ -150,7 +146,7 @@ export function applyScenarioToGame(
   gameState.totalWater = scenario.startWater;
 
   scenario.plants.forEach(({ type, x, y }) => {
-    plantManager.plant(type, x, y); 
+    plantManager.plant(type, x, y);
   });
 
   scenario.zombies.initialSpawns.forEach(({}) => {
