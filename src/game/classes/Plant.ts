@@ -12,7 +12,7 @@ export default class Plant implements IPlant {
   public i: number; // Grid row
   public j: number; // Grid column
   protected scene: Phaser.Scene | null;
-  protected growthLevel: number;
+  public growthLevel: number;
   public sprite: Phaser.GameObjects.Sprite | null;
   public texture: string;
 

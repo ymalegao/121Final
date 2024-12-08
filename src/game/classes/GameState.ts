@@ -9,7 +9,7 @@ import Plant from './Plant';
 export interface SavedGameState {
   gridState: number[]; // Serialized GridState
   playerPosition: { x: number; y: number };
-  plants: Plant[]; // Array of plant objects with their states
+  plants: { i: number; j: number; texture: string; sunLight: number; water: number; upgradeCost: number; growthLevel: number }[]; // Include necessary properties
   zombies: { i: number; j: number }[];
   totalSun: number; // Total sunlight
   totalWater: number; // Total water
@@ -155,8 +155,15 @@ export default class GameState {
     return {
       gridState: Array.from(this.gridState.getRawState()),
       playerPosition: { x: this.player.position.x, y: this.player.position.y },
-      plants: this.plantManager.plants.map((plant) => plant.clone()),
-      zombies: this.zombieManager.zombies.map((z) => ({ i: z.i, j: z.j })),
+      plants: this.plantManager.plants.map((plant) => ({
+        i: plant.i,
+        j: plant.j,
+        texture: plant.texture,
+        sunLight: plant.sunLight,
+        water: plant.water,
+        upgradeCost: plant.upgradeCost,
+        growthLevel: plant.growthLevel,
+      })),      zombies: this.zombieManager.zombies.map((z) => ({ i: z.i, j: z.j })),
       totalSun: this.scene.totalSun,
       totalWater: this.scene.totalWater,
     };
@@ -177,10 +184,19 @@ export default class GameState {
     this.plantManager.destroyAllPlants();
     this.zombieManager.destroyAllZombies();
 
-    this.plantManager.plants = state.plants.map((plantClone) => {
-      plantClone.reAddToScene(this.scene);
-      return plantClone;
-    });
+    this.plantManager.plants = state.plants.map((pData) => {
+        const newPlant = new Plant(
+          this.scene,
+          pData.i,
+          pData.j,
+          pData.texture,
+          pData.sunLight,
+          pData.water,
+          pData.upgradeCost,
+          pData.growthLevel
+        );
+        return newPlant;
+      });
 
     this.zombieManager.zombies = state.zombies.map((zData) => {
       const newZombie = new Zombie(this.scene, zData.i, zData.j, 'Zombie');

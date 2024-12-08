@@ -285,30 +285,18 @@ export default class DefaultScene extends Phaser.Scene {
               this.player.position.x,
               this.player.position.y,
             );
-
-            // Check if any adjacent plant is an attack plant
-            const isAdjacentToAttackPlant = adjacentPlants.some(
-              (plant) => plant.type === 'attack',
-            );
-
-            if (isAdjacentToAttackPlant) {
-              console.log(
-                'Cannot plant attack plant next to another attack plant!',
-              );
-              return; // Prevent planting if adjacent to another attack plant
-            }
-
-            // Apply resource discount if there are other plants nearby
+      
+            // Check if any adjacent plant exists
             if (adjacentPlants.length > 0) {
-              this.totalSun -= this.baseCostSun * 0.5; // Discount for adjacent positioning
-              this.totalWater -= this.baseCostWater * 0.5;
-              this.updateSunAndWaterUI(this.totalSun, this.totalWater);
-            } else {
-              this.totalSun -= this.baseCostSun;
-              this.totalWater -= this.baseCostWater;
-              this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+              console.log('Cannot plant attack plant next to any other plant!');
+              return; // Prevent planting if there are adjacent plants
             }
-
+      
+            // Deduct resources for planting the attack plant
+            this.totalSun -= this.baseCostSun;
+            this.totalWater -= this.baseCostWater;
+            this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+      
             // Place the attack plant
             this.plantManager.plant(
               'attack',

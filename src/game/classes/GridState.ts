@@ -27,6 +27,8 @@ class GridState {
     waterLevel: number;
   } {
     const index = this.getIndex(x, y);
+    console.log("plantLevel", this.stateArray[index + 1]);
+
     return {
       plantType: this.stateArray[index],
       plantLevel: this.stateArray[index + 1],
