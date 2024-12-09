@@ -163,3 +163,54 @@ Undo/redo and on-screen notifications (e.g., "Planted a Sunflower at [3, 2]") im
 ### Cross-Module Collaboration:
 
 The modular design ensured seamless integration across files like `GridManager.ts`, `PlantManager.ts`, and `GameState.ts`. This structure allowed efficient implementation of requirements like F1.b and F1.c without duplication of effort.
+
+# F2 Devlog - [12/09/2024]
+
+## F0 + F1: Determine if the previous F0 and F1 requirements remain satisfied in the latest version of your software
+The latest version of our project fulfills the F0 and F1 requirements. As a group, we have emphasized and focused on completing the upcoming requirements and attempted to improve our code structure and make sure it’s clear and concise.
+
+## F2.a: External DSL for Scenario Design
+Our external DSL for scenario design facilitates intuitive gameplay definitions for designers. We utilize a structured format based on readable text files, allowing easy modifications to game scenarios without needing to access the underlying code.
+
+Below is a brief example showcasing the format used in our `gameplayscenario.dsl`:
+
+![External DSL for Scenario Design Visualization](public\External DSL.png)
+
+**Natural Language Explanation:** This scenario outlines a default gameplay setting where the grid size is 10x10, the initial sun and water resources are defined, plant placements are specified, and zombie spawn rates are outlined. The defeat condition adds a layer of urgency to gameplay.
+
+### Technical Details:
+- The `SCENARIO` keyword defines the context of the gameplay.
+- `GRID_SIZE` determines the game area dimensions, allowing flexibility in designing larger or smaller maps.
+- `START_SUN` and `START_WATER` initialize the resources for gameplay engagement.
+- The `PLANTS` and `ZOMBIES` sections specify game elements, allowing for precise placements and functionalities.
+- The `EVENTS` section introduces time-based actions within the gameplay, allowing us to dynamically manipulate the game state based on game progress.
+
+With the parsing logic we’ve implemented in `DSLParser.js`, each of these keywords is interpreted and converted into structured data, which the game can utilize to create an engaging player experience.
+
+## F2.b: Internal DSL for Plants and Growth Conditions
+Our internal DSL, developed in TypeScript, enables detailed definitions of plant types and their growth conditions. The structure ensures that each plant's unique requirements are articulated, allowing for versatile gameplay mechanics.
+
+An example from our `PlantDSL.dsl` file is:
+
+![Internal DSL for Plant and Growth Conditions Visualization](public\Internal DSL.png)
+
+**Natural Language Explanation:** This internal DSL illustrates the structure for defining plant types and their respective growth conditions in a straightforward manner. The ability to implement complex conditions enhances the depth of gameplay and encourages strategic planning.
+
+### Technical Details:
+- The `PLANT_TYPES` header signals the start of our plant definitions.
+- Each `TYPE` definition specifies the plant's unique name, followed by `GROWTH_CONDITION`, which includes specific requirements for growth.
+- For instance, the "sun" plant requires a minimum of 100 sunlight and 100 water to thrive, emphasizing resource management within the game.
+- The `ABILITY` property defines the plant's functionality, adding layers to gameplay strategies. For example, the "sun" plant's ability to generate sun can support other plant types, while the "attack" plant's ability allows it to engage zombies directly.
+
+This level of detail allows for the creation of complex scenarios where players must consider plant placement and resource management strategically. By leveraging TypeScript's capabilities, we ensure that our internal DSL can accommodate additional features in the future, such as synergistic effects between different plant types or interactions with other game elements.
+
+## F2.c: Switch to Alternate Platform
+We successfully moved our project from TypeScript to JavaScript. This change provided greater compatibility and accessibility across diverse platforms. While core components were largely transferable, we refined our game logic to accommodate JavaScript's dynamic capabilities, improving both performance and the developer experience. Initially, we aimed to switch from the Phaser framework to the Pixi.js framework, but we ultimately decided to keep our current framework due to its capabilities and what it offers for our game regarding collision detection, physics, and more.
+
+## Reflection
+Looking back on how we achieved the F2 requirements:
+- **Technical Adaptations:** We successfully devised a structured external DSL format using plain text for scenario definitions, enabling designers to articulate gameplay scenarios without delving into the codebase.
+- **Parsing Logic:** Implemented robust parsing logic in `DSLParser.js` to read and interpret the external DSL files, transforming them into structured game scenarios that could dynamically affect game state.
+- **Internal DSL Implementation:** Leveraged TypeScript to define plant growth conditions and abilities, creating an expressive internal DSL that captures complex growth dynamics while maintaining ease of use within the main game framework.
+- **Event Scheduling:** Designed a preliminary event scheduling system that integrates with the game state, allowing us to introduce timed actions that enhance gameplay strategy and interactivity.
+- **Platform Transition:** Implemented the migration from TypeScript to JavaScript, adjusting our code structure to fit JavaScript’s capabilities while ensuring that core functionalities and game mechanics were preserved.
