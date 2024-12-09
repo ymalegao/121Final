@@ -1,392 +1,223 @@
-import Phaser from 'phaser';
+import * as PIXI from 'pixi.js';
 import GridManager from '../classes/GridManager';
 import Player from '../classes/Player';
 import PlantManager from '../classes/PlantManager';
 import ZombieManager from '../classes/ZombieManager';
 import GameState from '../classes/GameState';
-// import InputManager from './InputManager';
 import { parseDSL, applyScenarioToGame } from '../../DSL/DSLParser';
 
-export default class DefaultScene extends Phaser.Scene {
+export default class DefaultScene {
+  public container: PIXI.Container;
   public gridManager: GridManager;
-  public isGameOver: boolean = false;
   public player: Player;
   public plantManager: PlantManager;
   public zombieManager: ZombieManager;
-  public sunText: Phaser.GameObjects.Text;
-  public waterText: Phaser.GameObjects.Text;
-  public sunBar: Phaser.GameObjects.Graphics;
-  public waterBar: Phaser.GameObjects.Graphics;
-  public baseCostSun: number = 100;
-  public baseCostWater: number = 100;
   public gameState: GameState;
-  public totalSun: number;
-  public totalWater: number;
+  public totalSun: number = 0;
+  public totalWater: number = 0;
+  public sunText: PIXI.Text;
+  public waterText: PIXI.Text;
+  public sunBar: PIXI.Graphics;
+  public waterBar: PIXI.Graphics;
+  public isGameOver: boolean = false;
 
-  constructor() {
-    super('DefaultScene');
-  }
+  constructor(public app: PIXI.Application) {
+    this.container = new PIXI.Container();
+    this.app.stage.addChild(this.container);
 
-  public preload() {
-    //IF YOU ARE PUSHING TO GITHUB USE /121Final//assets/... INSTEAD OF ../assets/... IDK WHY
-    //THIS IS FOR THE GITHUB PAGES
-    // this.load.image('sunflower', '/121Final//assets/Sunflower.png');
-    // this.load.image('Zombie', '/121Final//assets/Chomper.png');
-    // this.load.image('attackPlant', '/121Final//assets/attackPlant.png');
-
-    // THIS IS FOR LOCAL TESTING
-    this.load.image('sunflower', '../assets/Sunflower.png');
-    this.load.image('Zombie', '../assets/Chomper.png');
-    this.load.image('attackPlant', '../assets/attackPlant.png');
-  }
-
-  async create() {
+    // Initialize game grid and managers
     const cellSize = 64;
     const gridWidth = 16;
     const gridHeight = 16;
-    const scenario = await parseDSL('./src/DSL/gameplayscenario.dsl');
 
-    this.isGameOver = false; // Reset the game-over flag
-
-    this.gridManager = new GridManager(this, cellSize, gridWidth, gridHeight);
-    this.player = new Player(this, this.gridManager, 0, 0);
-    this.plantManager = new PlantManager(this, this.gridManager);
-    this.zombieManager = new ZombieManager(this, this.gridManager);
+    this.gridManager = new GridManager(this.container, cellSize, gridWidth, gridHeight);
+    this.player = new Player(this.container, this.gridManager, 0, 0);
+    this.plantManager = new PlantManager(this.container, this.gridManager);
+    this.zombieManager = new ZombieManager(this.container, this.gridManager);
     this.gameState = new GameState(
       this.gridManager.gridState,
       this.player,
       this.plantManager,
-      this.zombieManager,
-      this,
+      this.zombieManager
     );
 
+    this.setupUI();
+    this.setupInput();
+    this.loadScenario('./src/DSL/gameplayscenario.dsl');
+  }
+
+  async loadScenario(scenarioPath: string): Promise<void> {
+    const scenario = await parseDSL(scenarioPath);
     applyScenarioToGame(
       scenario,
       this.gameState,
       this.gridManager,
       this.plantManager,
-      this.zombieManager,
+      this.zombieManager
     );
     console.log('Scenario applied properly', scenario);
+  }
 
-    // Player movement controls
-    if (this.input && this.input.keyboard) {
-      this.input.keyboard.on('keydown', (event: { key: string }) => {
-        if (
-          event.key === 'ArrowUp' ||
-          event.key === 'ArrowDown' ||
-          event.key === 'ArrowLeft' ||
-          event.key === 'ArrowRight'
-        ) {
+  setupUI(): void {
+    // Initialize text for Sun and Water
+    this.sunText = new PIXI.Text('Sun: 0', { fontSize: 16, fill: '#fff' });
+    this.sunText.position.set(16, 16);
+    this.container.addChild(this.sunText);
+
+    this.waterText = new PIXI.Text('Water: 0', { fontSize: 16, fill: '#fff' });
+    this.waterText.position.set(16, 40);
+    this.container.addChild(this.waterText);
+
+    // Initialize progress bars for Sun and Water
+    this.sunBar = new PIXI.Graphics();
+    this.sunBar.beginFill(0xffff00); // Yellow for Sun
+    this.sunBar.drawRect(100, 10, 200, 20); // Placeholder bar
+    this.sunBar.endFill();
+    this.container.addChild(this.sunBar);
+
+    this.waterBar = new PIXI.Graphics();
+    this.waterBar.beginFill(0x1e90ff); // Blue for Water
+    this.waterBar.drawRect(100, 34, 200, 20); // Placeholder bar
+    this.waterBar.endFill();
+    this.container.addChild(this.waterBar);
+  }
+
+  setupInput(): void {
+    window.addEventListener('keydown', (event) => {
+      switch (event.key) {
+        case 'ArrowUp':
           this.gameState.saveState();
+          this.player.move('up');
+          break;
+        case 'ArrowDown':
+          this.gameState.saveState();
+          this.player.move('down');
+          break;
+        case 'ArrowLeft':
+          this.gameState.saveState();
+          this.player.move('left');
+          break;
+        case 'ArrowRight':
+          this.gameState.saveState();
+          this.player.move('right');
+          break;
+        case 'N':
+            console.log('Advancing turn');
+          this.gameState.saveState();
+          this.advanceTurn();
+          this.gameState.autoSave();
+          break;
+        case 'Z':
+          this.gameState.undo();
+          break;
+        case 'Y':
+          this.gameState.redo();
+          break;
+        case 'S': {
+          const slotName = prompt('Enter a save slot name:');
+          if (slotName) this.gameState.saveToSlot(`saveSlot-${slotName}`);
+          break;
         }
-        if (event.key === 'ArrowUp') this.player.move('up');
-        if (event.key === 'ArrowDown') this.player.move('down');
-        if (event.key === 'ArrowLeft') this.player.move('left');
-        if (event.key === 'ArrowRight') this.player.move('right');
-      });
-
-      this.input.keyboard.on('keydown-Z', () => {
-        console.log(
-          'sun and water resource before undo: ' +
-            this.totalSun +
-            ' ' +
-            this.totalWater,
-        );
-        this.gameState.undo();
-        console.log(
-          'sun and water resource after undo: ' +
-            this.totalSun +
-            ' ' +
-            this.totalWater,
-        );
-      });
-
-      this.input.keyboard.on('keydown-Y', () => {
-        this.gameState.redo();
-      });
-
-      // Progress turn -> Receive Sun and Water
-      this.input.keyboard.on('keydown-N', () => {
-        this.gameState.saveState(); // Save the current state
-        this.advanceTurn();
-        this.gameState.autoSave();
-        console.log('water ', this.totalWater);
-        console.log(' state ', this.gameState);
-        this.gameState.saveState();
-        console.log(' new state ', this.gameState);
-      });
-
-      // Create UI elements for sun and water
-      this.createResourceDisplay();
-    }
-
-    const autoSaveExists = localStorage.getItem('autoSaveSlot') !== null;
-    console.log('Auto-save exists: ', autoSaveExists);
-    if (autoSaveExists) {
-      const continueGame = confirm(
-        'An auto-save is available. Continue where you left off?',
-      );
-      if (continueGame) {
-        const loadedState = GameState.loadFromSlot(
-          'autoSaveSlot',
-          this.gridManager.gridState,
-          this.player,
-          this.plantManager,
-          this.zombieManager,
-          this,
-        );
-        if (loadedState) {
-          this.gameState = loadedState;
+        case 'L': {
+          const slotName = prompt('Enter a save slot name to load:');
+          if (slotName) {
+            const loadedState = GameState.loadFromSlot(
+              `saveSlot-${slotName}`,
+              this.gridManager.gridState,
+              this.player,
+              this.plantManager,
+              this.zombieManager
+            );
+            if (loadedState) this.gameState = loadedState;
+          }
+          break;
         }
-      } else {
-        // Start fresh: do nothing or initialize a new GameState as normal.
+        case 'P':
+          this.plantSunPlant();
+          break;
+        case 'A':
+          this.plantAttackPlant();
+          break;
       }
+    });
+  }
+
+  plantSunPlant(): void {
+    if (
+      this.player.position.x % 2 === 0 &&
+      this.player.position.y % 2 === 0 &&
+      this.totalSun >= 100 &&
+      this.totalWater >= 75
+    ) {
+      const costMultiplier = this.plantManager.getAdjacentPlants(
+        this.player.position.x,
+        this.player.position.y
+      ).length > 0
+        ? 0.5
+        : 1;
+
+      this.totalSun -= 100 * costMultiplier;
+      this.totalWater -= 75 * costMultiplier;
+      this.updateResourceDisplay();
+
+      this.plantManager.plant('sun', this.player.position.x, this.player.position.y);
     } else {
-      // No auto-save available, just start fresh as usual.
+      console.log('Not enough resources or invalid tile for planting!');
     }
-
-    this.input.keyboard.on('keydown-S', () => {
-      const slotName = prompt('Enter a save slot name:');
-      if (slotName) {
-        this.gameState.saveToSlot(`saveSlot-${slotName}`);
-      }
-    });
-
-    // Load game from a slot
-    this.input.keyboard.on('keydown-L', () => {
-      const slotName = prompt('Enter a save slot name to load:');
-      if (slotName) {
-        const loadedState = GameState.loadFromSlot(
-          `saveSlot-${slotName}`,
-          this.gridManager.gridState,
-          this.player,
-          this.plantManager,
-          this.zombieManager,
-          this,
-        );
-        if (loadedState) {
-          this.gameState = loadedState;
-        }
-      }
-    });
-
-    // List available slots
-    this.input.keyboard.on('keydown-B', () => {
-      console.log(GameState.getAvailableSaveSlots());
-    });
-
-    // Method to get the current game state
   }
 
-  private createResourceDisplay() {
-    // Text for Sun and Water
-    this.sunText = this.add.text(16, 16, 'Sun: 0', {
-      fontSize: '16px',
-      color: '#fff',
-    });
-    this.waterText = this.add.text(16, 40, 'Water: 0', {
-      fontSize: '16px',
-      color: '#fff',
-    });
+  plantAttackPlant(): void {
+    if (this.totalSun >= 100 && this.totalWater >= 75) {
+      const adjacentPlants = this.plantManager.getAdjacentPlants(
+        this.player.position.x,
+        this.player.position.y
+      );
 
-    // Progress bars for Sun and Water
-    this.sunBar = this.add.graphics();
-    this.sunBar.fillStyle(0xffff00, 0); // Yellow for sun
-    this.sunBar.fillRect(100, 10, 200, 20); // Create a placeholder bar
+      if (adjacentPlants.length > 0) {
+        console.log('Cannot plant attack plant next to any other plant!');
+        return;
+      }
 
-    this.waterBar = this.add.graphics();
-    this.waterBar.fillStyle(0x1e90ff, 0); // Blue for water
-    this.waterBar.fillRect(100, 34, 200, 20); // Create a placeholder bar
+      this.totalSun -= 100;
+      this.totalWater -= 75;
+      this.updateResourceDisplay();
+
+      this.plantManager.plant('attack', this.player.position.x, this.player.position.y);
+    } else {
+      console.log('Not enough resources for attack plant!');
+    }
   }
 
-  private advanceTurn(): void {
-    console.log('Advancing time...');
+  advanceTurn(): void {
+    if (this.isGameOver) return;
 
-    // Stop advancing if the game is over
-    if (this.isGameOver) {
-      return;
-    }
-
-    // Update grid resources and plants
     this.gridManager.updateSunAndWaterLevels();
     this.plantManager.updatePlants();
     this.zombieManager.updateZombies();
-
-    // Update UI resources
     this.updateResourceDisplay();
   }
 
-  public updateResourceDisplay() {
-    // Sum up the sun and water values for all cells
+  updateResourceDisplay(): void {
+    this.totalSun = 0;
+    this.totalWater = 0;
+
     for (let y = 0; y < this.gridManager.gridHeight; y++) {
       for (let x = 0; x < this.gridManager.gridWidth; x++) {
         const cellData = this.gridManager.getCellResources(x, y);
         if (cellData) {
-          this.totalSun = cellData.sun;
-          this.totalWater = cellData.water;
+          this.totalSun += cellData.sun;
+          this.totalWater += cellData.water;
         }
       }
     }
 
-    // Update the counters and progress bars once, after summing up
-    this.updateSunAndWaterUI(this.totalSun, this.totalWater);
+    this.sunText.text = `Sun: ${this.totalSun}`;
+    this.waterText.text = `Water: ${this.totalWater}`;
 
-    // Add event listener for planting with the 'P' key (Calculating how much plant costs)
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'P' || event.key === 'p') {
-        // Check if 'P' (or lowercase 'p') is pressed
+    const sunPercentage = Math.min(this.totalSun / 100, 1);
+    const waterPercentage = Math.min(this.totalWater / 100, 1);
 
-        // Check if the player is on an even tile (both x and y are even)
-        if (
-          this.player.position.x % 2 === 0 &&
-          this.player.position.y % 2 === 0
-        ) {
-          // Ensure sufficient resources
-          if (this.totalSun >= 100 && this.totalWater >= 75) {
-            // Check if there are adjacent plants
-            if (
-              this.plantManager.getAdjacentPlants(
-                this.player.position.x,
-                this.player.position.y,
-              ).length > 0
-            ) {
-              // Discount for adjacency
-              this.totalSun -= this.baseCostSun * 0.5;
-              this.totalWater -= this.baseCostWater * 0.5;
-              this.updateSunAndWaterUI(this.totalSun, this.totalWater);
-            } else {
-              this.totalSun -= this.baseCostSun;
-              this.totalWater -= this.baseCostWater;
-              this.updateSunAndWaterUI(this.totalSun, this.totalWater);
-            }
-
-            // Plant the "sun" plant at the player’s position
-            this.plantManager.plant(
-              'sun',
-              this.player.position.x,
-              this.player.position.y,
-            );
-            this.gridManager.sunPlants += 1;
-          } else {
-            console.log('Not enough resources to plant!');
-          }
-        } else {
-          console.log('Plant can only be placed on even tiles!');
-        }
-      }
-
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'A' || event.key === 'a') {
-          // Check if the player has enough resources
-          if (this.totalSun >= 100 && this.totalWater >= 75) {
-            // Get adjacent plants to the current position
-            const adjacentPlants = this.plantManager.getAdjacentPlants(
-              this.player.position.x,
-              this.player.position.y,
-            );
-      
-            // Check if any adjacent plant exists
-            if (adjacentPlants.length > 0) {
-              console.log('Cannot plant attack plant next to any other plant!');
-              return; // Prevent planting if there are adjacent plants
-            }
-      
-            // Deduct resources for planting the attack plant
-            this.totalSun -= this.baseCostSun;
-            this.totalWater -= this.baseCostWater;
-            this.updateSunAndWaterUI(this.totalSun, this.totalWater);
-      
-            // Place the attack plant
-            this.plantManager.plant(
-              'attack',
-              this.player.position.x,
-              this.player.position.y,
-            );
-          } else {
-            console.log('Not enough resources to plant attack plant!');
-          }
-        }
-      });
-    });
-  }
-
-  // Helper method to update both sun and water UI components
-  public updateSunAndWaterUI(totalSun: number, totalWater: number): void {
-    // Update the text displays
-
-    console.log('sun and water resource: ' + totalSun + ' ' + totalWater);
-    if (this.totalSun == undefined || this.totalWater == undefined) {
-      totalSun = 0;
-      totalWater = 0;
-    }
-    this.sunText.setText(`Sun: ${totalSun}`);
-    this.waterText.setText(`Water: ${totalWater}`);
-
-    // Calculate progress percentages
-    const sunPercentage = Phaser.Math.Clamp(
-      totalSun / (this.gridManager.gridWidth * this.gridManager.gridHeight * 5),
-      0,
-      1,
-    );
-    const waterPercentage = Phaser.Math.Clamp(
-      totalWater /
-        (this.gridManager.gridWidth * this.gridManager.gridHeight * 10),
-      0,
-      1,
-    );
-
-    // Update the sun bar
-    this.sunBar.clear();
-    this.sunBar.fillStyle(0xffff00, 1); // Yellow for sun
-    this.sunBar.fillRect(100, 10, 200 * sunPercentage, 20);
-
-    // Update the water bar
-    this.waterBar.clear();
-    this.waterBar.fillStyle(0x1e90ff, 1); // Blue for water
-    this.waterBar.fillRect(120, 34, 200 * waterPercentage, 20);
-  }
-
-  public gameOver(): void {
-    console.log('Game Over!');
-    this.isGameOver = true; // Set the game-over flag
-
-    this.zombieManager.destroyAllZombies(); // Destroy all zombies
-    // Display "Game Over" message
-    this.add
-      .text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY - 30,
-        'Game Over!',
-        {
-          fontFamily: '"Press Start 2P", sans-serif',
-          fontSize: '24px',
-          color: '#FF0000',
-        },
-      )
-      .setOrigin(0.5);
-
-    // Display "Press R to Restart" message
-    this.add
-      .text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY + 20,
-        'Press R to Restart',
-        {
-          fontFamily: '"Press Start 2P", sans-serif',
-          fontSize: '16px',
-          color: '#FFFFFF',
-        },
-      )
-      .setOrigin(0.5);
-
-    // Restart game on "R" key press
-    if (this.input && this.input.keyboard) {
-      const rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-      rKey.once('down', () => {
-        console.log('Restarting game...');
-        this.scene.restart(); // Restart the current scene
-      });
-    }
+    this.sunBar.clear().beginFill(0xffff00).drawRect(100, 10, 200 * sunPercentage, 20).endFill();
+    this.waterBar.clear().beginFill(0x1e90ff).drawRect(100, 34, 200 * waterPercentage, 20).endFill();
   }
 }

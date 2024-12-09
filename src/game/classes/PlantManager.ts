@@ -1,15 +1,16 @@
+import * as PIXI from 'pixi.js';
 import GridManager from './GridManager';
 import Plant from './Plant';
 import SunPlant from './SunPlant';
 import AttackPlant from './AttackPlant';
 
 export default class PlantManager {
-  private scene: Phaser.Scene;
+  public container: PIXI.Container; // Parent container for plant sprites
   private gridManager: GridManager;
   public plants: Plant[]; // Array of Plant objects
 
-  constructor(scene: Phaser.Scene, gridManager: GridManager) {
-    this.scene = scene;
+  constructor(container: PIXI.Container, gridManager: GridManager) {
+    this.container = container;
     this.gridManager = gridManager;
     this.plants = []; // Initialize an empty list of plants
   }
@@ -29,10 +30,10 @@ export default class PlantManager {
     let plant: Plant;
     switch (type) {
       case 'sun':
-        plant = new SunPlant(this.scene, gridX, gridY);
+        plant = new SunPlant(this.container, gridX, gridY);
         break;
       case 'attack':
-        plant = new AttackPlant(this.scene, gridX, gridY);
+        plant = new AttackPlant(this.container, gridX, gridY);
         break;
       default:
         console.log('Invalid plant type.');
@@ -90,13 +91,6 @@ export default class PlantManager {
     this.plants = []; // Clear the plants array
     console.log('All plants destroyed.');
   }
-
-  // Redraw all plants
-  // public redrawPlants(): void {
-  //     this.plants.forEach((plant) => {
-  //         plant.redraw(); // Recreate sprite using the plant's own method
-  //     });
-  // }
 
   // Get adjacent plants
   public getAdjacentPlants(gridX: number, gridY: number): Plant[] {

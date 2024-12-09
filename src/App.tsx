@@ -1,22 +1,13 @@
 import { useRef, useState } from 'react';
-import { IRefPhaserGame, PhaserGame } from './game/PhaserGame';
-import GameState from './game/classes/GameState';
+import { IRefPixiGame, PixiGame } from './game/PixiGame';
 
 function App() {
-  const phaserRef = useRef<IRefPhaserGame | null>(null);
-  const [saveSlots, setSaveSlots] = useState(GameState.getAvailableSaveSlots());
+  const pixiRef = useRef<IRefPixiGame | null>(null);
   const [slotName, setSlotName] = useState('');
 
-  // Save the current game state
   const handleSave = () => {
-    if (phaserRef.current) {
+    if (pixiRef.current) {
       try {
-        // const gameState = phaserRef.current.getGameState();
-
-        // SaveManager.saveGame(slotName, gameState);
-
-        // setSaveSlots(SaveManager.getSaveSlots());
-
         alert(`Game saved successfully to slot "${slotName}"`);
       } catch (error) {
         console.error('Error saving game:', error);
@@ -25,33 +16,6 @@ function App() {
     } else {
       alert('Game instance not available.');
     }
-  };
-
-  // Load a saved game state
-  const handleLoad = (slot: string) => {
-    console.log('Loading game from slot:', slot);
-    // if (phaserRef.current) {
-    //   try {
-    //     const savedState = SaveManager.loadGame(slot, sa);
-    //     if (savedState) {
-    //       savedState.restoreState(savedState.getCurrentState());
-    //       alert(`Game loaded from slot "${slot}"`);
-    //     }
-    //   } catch (error) {
-    //     console.error('Error loading game:', error);
-    //     alert('Failed to load the game state.');
-    //   }
-    // } else {
-    //   alert('Game instance not available.');
-    // }
-  };
-
-  // Delete a save slot
-  const handleDelete = (slot: string) => {
-    console.log('Deleting save slot:', slot);
-    // SaveManager.deleteSave(slot);
-    // setSaveSlots(SaveManager.getSaveSlots());
-    // alert(`Save slot "${slot}" deleted.`);
   };
 
   return (
@@ -66,19 +30,7 @@ function App() {
         />
         <button onClick={handleSave}>Save Game</button>
       </div>
-      <div>
-        <h2>Save Slots</h2>
-        <ul>
-          {saveSlots.map((slot) => (
-            <li key={slot}>
-              {slot}
-              <button onClick={() => handleLoad(slot)}>Load</button>
-              <button onClick={() => handleDelete(slot)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <PhaserGame ref={phaserRef} />
+      <PixiGame ref={pixiRef} />
     </div>
   );
 }

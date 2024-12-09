@@ -1,75 +1,94 @@
-import Phaser from 'phaser';
+import * as PIXI from 'pixi.js';
 
 export default class UIManager {
-    private scene: Phaser.Scene;
-    public sunText: Phaser.GameObjects.Text;
-    public waterText: Phaser.GameObjects.Text;
-    private sunBar: Phaser.GameObjects.Graphics;
-    private waterBar: Phaser.GameObjects.Graphics;
+    private app: PIXI.Application;
+    public sunText: PIXI.Text;
+    public waterText: PIXI.Text;
+    private sunBar: PIXI.Graphics;
+    private waterBar: PIXI.Graphics;
 
-    constructor(scene: Phaser.Scene, sunText: Phaser.GameObjects.Text, waterText: Phaser.GameObjects.Text) {
-        this.scene = scene;
+    constructor(app: PIXI.Application) {
+        this.app = app;
         this.createResourceDisplay();
-        this.sunText =  sunText;
-        this.waterText = waterText;
     }
 
     public createResourceDisplay() {
         // Text for Sun and Water
-        this.sunText = this.scene.add.text(16, 16, 'Sun: 0', {
-            fontSize: '16px',
-            color: '#fff',
+        const textStyle = new PIXI.TextStyle({
+            fontSize: 16,
+            fill: '#ffffff',
         });
-        this.waterText = this.scene.add.text(16, 40, 'Water: 0', {
-            fontSize: '16px',
-            color: '#fff',
-        });
+
+        this.sunText = new PIXI.Text('Sun: 0', textStyle);
+        this.sunText.position.set(16, 16);
+        this.app.stage.addChild(this.sunText);
+
+        this.waterText = new PIXI.Text('Water: 0', textStyle);
+        this.waterText.position.set(16, 40);
+        this.app.stage.addChild(this.waterText);
 
         // Progress bars for Sun and Water
-        this.sunBar = this.scene.add.graphics();
-        this.sunBar.fillStyle(0xffff00, 1); // Yellow for sun
-        this.sunBar.fillRect(100, 10, 200, 20);
+        this.sunBar = new PIXI.Graphics();
+        this.sunBar.beginFill(0xffff00); // Yellow for sun
+        this.sunBar.drawRect(100, 10, 200, 20);
+        this.sunBar.endFill();
+        this.app.stage.addChild(this.sunBar);
 
-        this.waterBar = this.scene.add.graphics();
-        this.waterBar.fillStyle(0x1e90ff, 1); // Blue for water
-        this.waterBar.fillRect(100, 34, 200, 20);
+        this.waterBar = new PIXI.Graphics();
+        this.waterBar.beginFill(0x1e90ff); // Blue for water
+        this.waterBar.drawRect(100, 34, 200, 20);
+        this.waterBar.endFill();
+        this.app.stage.addChild(this.waterBar);
     }
 
     public updateResources(totalSun: number, totalWater: number, maxSun: number, maxWater: number): void {
         // Update the text displays
-        this.sunText.setText(`Sun: ${totalSun}`);
-        this.waterText.setText(`Water: ${totalWater}`);
-    
+        this.sunText.text = `Sun: ${totalSun}`;
+        this.waterText.text = `Water: ${totalWater}`;
+
         // Calculate progress percentages
-        const sunPercentage = Phaser.Math.Clamp(totalSun / maxSun, 0, 1);
-        const waterPercentage = Phaser.Math.Clamp(totalWater / maxWater, 0, 1);
-    
+        const sunPercentage = Math.max(0, Math.min(totalSun / maxSun, 1));
+        const waterPercentage = Math.max(0, Math.min(totalWater / maxWater, 1));
+
         // Update the sun bar
         this.sunBar.clear();
-        this.sunBar.fillStyle(0xffff00, 1); // Yellow for sun
-        this.sunBar.fillRect(100, 10, 200 * sunPercentage, 20); // Scale bar by percentage
-    
+        this.sunBar.beginFill(0xffff00); // Yellow for sun
+        this.sunBar.drawRect(100, 10, 200 * sunPercentage, 20); // Scale bar by percentage
+        this.sunBar.endFill();
+
         // Update the water bar
         this.waterBar.clear();
-        this.waterBar.fillStyle(0x1e90ff, 1); // Blue for water
-        this.waterBar.fillRect(100, 34, 200 * waterPercentage, 20); // Scale bar by percentage
+        this.waterBar.beginFill(0x1e90ff); // Blue for water
+        this.waterBar.drawRect(100, 34, 200 * waterPercentage, 20); // Scale bar by percentage
+        this.waterBar.endFill();
     }
 
     public showGameOver() {
-        this.scene.add
-            .text(this.scene.cameras.main.centerX, this.scene.cameras.main.centerY - 30, 'Game Over!', {
-                fontFamily: '"Press Start 2P", sans-serif',
-                fontSize: '24px',
-                color: '#FF0000',
-            })
-            .setOrigin(0.5);
+        const centerX = this.app.screen.width / 2;
+        const centerY = this.app.screen.height / 2;
 
-        this.scene.add
-            .text(this.scene.cameras.main.centerX, this.scene.cameras.main.centerY + 20, 'Press R to Restart', {
-                fontFamily: '"Press Start 2P", sans-serif',
-                fontSize: '16px',
-                color: '#FFFFFF',
-            })
-            .setOrigin(0.5);
+        const gameOverStyle = new PIXI.TextStyle({
+            fontFamily: 'Press Start 2P, sans-serif',
+            fontSize: 24,
+            fill: '#FF0000',
+            align: 'center',
+        });
+
+        const restartStyle = new PIXI.TextStyle({
+            fontFamily: 'Press Start 2P, sans-serif',
+            fontSize: 16,
+            fill: '#FFFFFF',
+            align: 'center',
+        });
+
+        const gameOverText = new PIXI.Text('Game Over!', gameOverStyle);
+        gameOverText.anchor.set(0.5);
+        gameOverText.position.set(centerX, centerY - 30);
+        this.app.stage.addChild(gameOverText);
+
+        const restartText = new PIXI.Text('Press R to Restart', restartStyle);
+        restartText.anchor.set(0.5);
+        restartText.position.set(centerX, centerY + 20);
+        this.app.stage.addChild(restartText);
     }
 }

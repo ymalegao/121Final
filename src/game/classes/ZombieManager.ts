@@ -1,31 +1,34 @@
+import * as PIXI from 'pixi.js';
 import GridManager from './GridManager';
 import Zombie from './Zombie';
 
 export default class ZombieManager {
-  private scene: Phaser.Scene;
+  public container: PIXI.Container; // Parent container for zombie sprites
   private gridManager: GridManager;
   public zombies: Zombie[]; // Array of zombie objects
 
-  constructor(scene: Phaser.Scene, gridManager: GridManager) {
-    this.scene = scene;
+  constructor(container: PIXI.Container, gridManager: GridManager) {
+    this.container = container;
     this.gridManager = gridManager;
     this.zombies = []; // Initialize an empty list of zombies
   }
 
   public spawnZombie(): void {
     const gridX = this.gridManager.gridWidth + 4.5; // Set to the far-right column of the grid
-    const gridY = Phaser.Math.Between(0, this.gridManager.gridHeight - 1); // Random row
-    const zombie = new Zombie(this.scene, gridX, gridY, 'Zombie'); // Use the correct texture key
+    const gridY = Math.floor(
+      Math.random() * this.gridManager.gridHeight
+    ); // Random row
+    const zombie = new Zombie(this.container, gridX, gridY, 'Zombie'); // Use the correct texture key
 
     // Adjust the zombie's world position to align with the far-right column of the grid
     if (zombie.sprite) {
       const { x, y } = zombie.getWorldPosition(gridX, gridY);
-      zombie.sprite.setPosition(x, y); // Set position to grid-aligned coordinates
+      zombie.sprite.position.set(x, y); // Set position to grid-aligned coordinates
     }
 
     this.zombies.push(zombie);
     console.log(
-      `Zombie spawned at grid position (${gridX}, ${gridY}) - far-right column`,
+      `Zombie spawned at grid position (${gridX}, ${gridY}) - far-right column`
     );
   }
 
@@ -55,7 +58,7 @@ export default class ZombieManager {
     }
   }
 
-  // Redraw all zombies in the scene
+  // Redraw all zombies in the container
   public redrawZombies(): void {
     this.zombies.forEach((zombie) => {
       zombie.redraw();
@@ -74,7 +77,7 @@ export default class ZombieManager {
   // Update all zombies (move them and potentially spawn new ones)
   public updateZombies(): void {
     this.moveZombies();
-    const randomZombieSpawnChance: number = Phaser.Math.Between(0, 100);
+    const randomZombieSpawnChance: number = Math.random() * 100;
     if (randomZombieSpawnChance > 50) {
       this.spawnZombie();
     }

@@ -13,6 +13,9 @@ class GridState {
 
   // Convert grid coordinates (x, y) to a 1D index
   private getIndex(x: number, y: number): number {
+    if (x < 0 || x >= this.gridWidth || y < 0 || y >= this.gridHeight) {
+      throw new Error(`Coordinates (${x}, ${y}) are out of bounds`);
+    }
     return (y * this.gridWidth + x) * 4;
   }
 
@@ -27,8 +30,6 @@ class GridState {
     waterLevel: number;
   } {
     const index = this.getIndex(x, y);
-    console.log("plantLevel", this.stateArray[index + 1]);
-
     return {
       plantType: this.stateArray[index],
       plantLevel: this.stateArray[index + 1],
@@ -51,6 +52,16 @@ class GridState {
     this.stateArray[index + 1] = plantLevel;
     this.stateArray[index + 2] = sunLevel;
     this.stateArray[index + 3] = waterLevel;
+  }
+
+  // Clear a cell
+  public clearCell(x: number, y: number): void {
+    this.setCell(x, y, 0, 0, 0, 0);
+  }
+
+  // Reset the entire grid
+  public reset(): void {
+    this.stateArray.fill(0);
   }
 
   // Get the raw byte array (for saving/loading)

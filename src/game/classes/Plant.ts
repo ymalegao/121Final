@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 interface IPlant {
   i: number;
   j: number;
@@ -11,19 +13,19 @@ interface IPlant {
 export default class Plant implements IPlant {
   public i: number; // Grid row
   public j: number; // Grid column
-  protected scene: Phaser.Scene | null;
+  protected container: PIXI.Container | null;
   public growthLevel: number;
-  public sprite: Phaser.GameObjects.Sprite | null;
+  public sprite: PIXI.Sprite | null;
   public texture: string;
 
   public sunLight: number; // Required sunlight
   public water: number; // Required water
   public growthUnlocked: boolean; // Can the plant grow
   public upgradeCost: number; // Upgrade cost for the plant
-  public type: string; // Add the 'type' property
+  public type: string; // Plant type
 
   constructor(
-    scene: Phaser.Scene | null,
+    container: PIXI.Container | null,
     gridX: number,
     gridY: number,
     texture: string,
@@ -32,7 +34,7 @@ export default class Plant implements IPlant {
     upgradeCost: number = 10, // Default upgrade cost
     growthLevel: number = 1, // Default growth level
   ) {
-    this.scene = scene;
+    this.container = container;
     this.i = gridX;
     this.j = gridY;
     this.growthLevel = growthLevel; // Start at level 1
@@ -42,33 +44,35 @@ export default class Plant implements IPlant {
     this.upgradeCost = upgradeCost;
     this.texture = texture;
 
-    if (scene) {
+    if (container) {
       const { x, y } = this.getWorldPosition(gridX, gridY);
-      this.sprite =
-        this.scene?.add
-          .sprite(x, y, texture)
-          .setOrigin(0.5)
-          .setScale((0.5 * this.growthLevel) / 20) || null;
+      this.sprite = PIXI.Sprite.from(texture);
+      this.sprite.anchor.set(0.5);
+      this.sprite.scale.set((0.5 * this.growthLevel) / 20);
+      this.sprite.position.set(x, y);
+      this.container.addChild(this.sprite);
     } else {
-      this.sprite = null; // No sprite if no scene provided
+      this.sprite = null; // No sprite if no container
     }
   }
 
   public destroy(): void {
     if (this.sprite) {
+      this.container?.removeChild(this.sprite);
       this.sprite.destroy();
       this.sprite = null;
       console.log(`Plant destroyed at (${this.i}, ${this.j})`);
     }
   }
 
-  public reAddToScene(scene: Phaser.Scene): void {
-    this.scene = scene;
+  public reAddToContainer(container: PIXI.Container): void {
+    this.container = container;
     const { x, y } = this.getWorldPosition(this.i, this.j);
-    this.sprite = this.scene.add
-      .sprite(x, y, this.texture)
-      .setOrigin(0.5)
-      .setScale((0.5 * this.growthLevel) / 20);
+    this.sprite = PIXI.Sprite.from(this.texture);
+    this.sprite.anchor.set(0.5);
+    this.sprite.scale.set((0.5 * this.growthLevel) / 20);
+    this.sprite.position.set(x, y);
+    this.container.addChild(this.sprite);
   }
 
   // Calculate the world position based on grid coordinates
@@ -96,7 +100,7 @@ export default class Plant implements IPlant {
     if (this.growthUnlocked) {
       this.growthLevel++;
       if (this.sprite) {
-        this.sprite.setScale((0.5 * this.growthLevel) / 20); // Increase size with growth
+        this.sprite.scale.set((0.5 * this.growthLevel) / 20); // Increase size with growth
       }
     }
   }

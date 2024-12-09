@@ -1,34 +1,44 @@
-export default class MenuScene extends Phaser.Scene {
-  constructor() {
-    super('MenuScene');
+import * as PIXI from 'pixi.js';
+
+export default class MenuScene {
+  private app: PIXI.Application;
+  public container: PIXI.Container;
+  private startGameCallback: () => void;
+
+  constructor(app: PIXI.Application, startGameCallback: () => void) {
+    this.app = app;
+    this.startGameCallback = startGameCallback;
+
+    // Create a container for the menu scene
+    this.container = new PIXI.Container();
+
+    // Initialize the menu
+    this.create();
   }
 
-  preload() {}
-
-  create() {
+  private create(): void {
     // Add title
-    const titleStyle = {
+    const titleStyle = new PIXI.TextStyle({
       fontFamily: 'Arial',
-      fontSize: '48px',
-      color: '#FFFFFF',
+      fontSize: 48,
+      fill: '#FFFFFF',
       align: 'center',
-    };
-    this.add
-      .text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY - 150,
-        'Plant vs Zombies Grid Game',
-        titleStyle,
-      )
-      .setOrigin(0.5);
+    });
+    const titleText = new PIXI.Text('Plant vs Zombies Grid Game', titleStyle);
+    titleText.anchor.set(0.5);
+    titleText.position.set(
+      this.app.renderer.width / 2,
+      this.app.renderer.height / 2 - 150
+    );
+    this.container.addChild(titleText);
 
     // Add instructions
-    const instructionsStyle = {
+    const instructionsStyle = new PIXI.TextStyle({
       fontFamily: 'Arial',
-      fontSize: '24px',
-      color: '#FFFFFF',
+      fontSize: 24,
+      fill: '#FFFFFF',
       align: 'center',
-    };
+    });
     const instructions = `
         Instructions:
         - Use Arrow Keys to Move.
@@ -39,42 +49,46 @@ export default class MenuScene extends Phaser.Scene {
         - Press Y to Redo.
         - Defend your grid and grow your plants!
         `;
-    this.add
-      .text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY,
-        instructions,
-        instructionsStyle,
-      )
-      .setOrigin(0.5);
+    const instructionsText = new PIXI.Text(instructions, instructionsStyle);
+    instructionsText.anchor.set(0.5);
+    instructionsText.position.set(
+      this.app.renderer.width / 2,
+      this.app.renderer.height / 2
+    );
+    this.container.addChild(instructionsText);
 
     // Add "Press SPACE to Start" text
-    const startStyle = {
+    const startStyle = new PIXI.TextStyle({
       fontFamily: 'Arial',
-      fontSize: '32px',
-      color: '#FFFF00',
+      fontSize: 32,
+      fill: '#FFFF00',
       align: 'center',
-    };
-    this.add
-      .text(
-        this.cameras.main.centerX,
-        this.cameras.main.centerY + 150,
-        'Press SPACE to Start',
-        startStyle,
-      )
-      .setOrigin(0.5);
+    });
+    const startText = new PIXI.Text('Press SPACE to Start', startStyle);
+    startText.anchor.set(0.5);
+    startText.position.set(
+      this.app.renderer.width / 2,
+      this.app.renderer.height / 2 + 150
+    );
+    this.container.addChild(startText);
 
-    // Define key input for starting the game
-    if (this.input && this.input.keyboard) {
-      const spaceKey = this.input.keyboard.addKey(
-        Phaser.Input.Keyboard.KeyCodes.SPACE,
-      );
+    // Setup keyboard input to start the game
+    window.addEventListener('keydown', this.handleKeyPress.bind(this));
+  }
 
-      // Start DefaultScene on SPACE press
-      spaceKey.once('down', () => {
-        console.log('test');
-        this.scene.start('DefaultScene'); // Replace with your game scene
-      });
+  private handleKeyPress(event: KeyboardEvent): void {
+    if (event.key === ' ') {
+      this.startGame();
     }
+  }
+
+  private startGame(): void {
+    window.removeEventListener('keydown', this.handleKeyPress.bind(this));
+    this.startGameCallback();
+  }
+
+  public destroy(): void {
+    this.container.destroy({ children: true });
+    window.removeEventListener('keydown', this.handleKeyPress.bind(this));
   }
 }
