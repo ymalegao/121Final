@@ -174,7 +174,7 @@ Our external DSL for scenario design facilitates intuitive gameplay definitions 
 
 Below is a brief example showcasing the format used in our `gameplayscenario.dsl`:
 
-![External DSL for Scenario Design Visualization](public\External DSL.png)
+![External DSL for Scenario Design Visualization](./public/External DSL.png)
 
 **Natural Language Explanation:** This scenario outlines a default gameplay setting where the grid size is 10x10, the initial sun and water resources are defined, plant placements are specified, and zombie spawn rates are outlined. The defeat condition adds a layer of urgency to gameplay.
 
@@ -192,7 +192,7 @@ Our internal DSL, developed in TypeScript, enables detailed definitions of plant
 
 An example from our `PlantDSL.dsl` file is:
 
-![Internal DSL for Plant and Growth Conditions Visualization](public\Internal DSL.png)
+![Internal DSL for Plant and Growth Conditions Visualization](./public/Internal DSL.png)
 
 **Natural Language Explanation:** This internal DSL illustrates the structure for defining plant types and their respective growth conditions in a straightforward manner. The ability to implement complex conditions enhances the depth of gameplay and encourages strategic planning.
 
