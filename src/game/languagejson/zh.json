@@ -1,0 +1,11 @@
+{
+  "title": "植物大战僵尸网格游戏",
+  "instructions": "说明:\n- 使用箭头键移动。\n- 按 P 种植太阳植物。\n- 按 A 种植攻击植物。\n- 按 N 前进一回合。\n- 按 Z 撤销。\n- 按 Y 重做。\n- 保卫你的网格并种植你的植物！",
+  "start": "按空格键开始",
+  "sun": "阳光",
+  "water": "水",
+  "gameOverMessage": "游戏结束！",
+  "restartPrompt": "按 R 重新开始",
+  "restartMessage": "正在重新开始游戏...",
+  "autosavePrompt": "检测到自动保存。要继续游戏吗？"
+}

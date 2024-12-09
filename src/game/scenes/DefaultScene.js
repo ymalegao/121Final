@@ -31,9 +31,20 @@ export default class DefaultScene extends Phaser.Scene {
     this.load.image('sunflower', '../assets/Sunflower.png');
     this.load.image('Zombie', '../assets/Chomper.png');
     this.load.image('attackPlant', '../assets/attackPlant.png');
+
+    //Loading Languages
+    this.load.json('English', 'src/game/languagejson/en.json');
+    this.load.json('Chinese', 'src/game/languagejson/zh.json');
+    this.load.json('Arabic', 'src/game/languagejson/ar.json');  
   }
 
   async create() {
+    this.translations = {
+      en: this.cache.json.get('en'),
+      zh: this.cache.json.get('zh'),
+      ar: this.cache.json.get('ar'),
+    };
+    
     const cellSize = 64;
     const gridWidth = 16;
     const gridHeight = 16;
@@ -60,6 +71,12 @@ export default class DefaultScene extends Phaser.Scene {
       this.plantManager,
       this.zombieManager
     );
+
+    this.translations = {
+      English: this.cache.json.get('English'),
+      Chinese: this.cache.json.get('Chinese'),
+      Arabic: this.cache.json.get('Arabic'),
+    };
 
     console.log('Scenario applied properly', scenario);
 

@@ -1,0 +1,11 @@
+{
+  "title": "Plant vs Zombies Grid Game",
+  "instructions": "Instructions:\n- Use Arrow Keys to Move.\n- Press P to Plant a Sun Plant.\n- Press A to Plant an Attack Plant.\n- Press N to Advance a Turn.\n- Press Z to Undo.\n- Press Y to Redo.\n- Defend your grid and grow your plants!",
+  "start": "Press SPACE to Start",
+  "sun": "Sun",
+  "water": "Water",
+  "gameOverMessage": "Game Over!",
+  "restartPrompt": "Press R to Restart",
+  "restartMessage": "Restarting game...",
+  "autosavePrompt": "An auto-save is available. Continue where you left off?"
+}
