@@ -20,7 +20,7 @@ const phasermsg = () => {
 };
 
 export default defineConfig({
-  base: './', // Ensures paths are relative
+  base: '/121Final/', // Ensures paths are relative
   plugins: [
     react(),
     phasermsg(),
