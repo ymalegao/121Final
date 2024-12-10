@@ -4,7 +4,6 @@ import PlantManager from '../../src/game/classes/PlantManager';
 import ZombieManager from '../../src/game/classes/ZombieManager';
 
 export async function parseDSL(fileUrl) {
-  
   const response = await fetch(fileUrl); // Fetch the file using fetch API
   const content = await response.text(); // Read the file content as text
   const lines = content.split('\n').map((line) => line.trim());
