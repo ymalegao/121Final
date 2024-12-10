@@ -7,6 +7,7 @@ import GameState from '../classes/GameState';
 import GridState from '../classes/GridState';
 import MenuScene from './MenuScene';
 import { parseDSL, applyScenarioToGame } from '../../DSL/DSLParser';
+import Zombie from '../classes/Zombie';
 
 export default class DefaultScene extends Phaser.Scene {
   gridManager = null;
@@ -307,11 +308,11 @@ export default class DefaultScene extends Phaser.Scene {
 
     this.sunBar?.clear();
     this.sunBar?.fillStyle(0xffff00, 1);
-    this.sunBar?.fillRect(100, 10, 200 * sunPercentage, 20);
+    this.sunBar?.fillRect(110, 10, 200 * sunPercentage, 20);
 
     this.waterBar?.clear();
     this.waterBar?.fillStyle(0x1e90ff, 1);
-    this.waterBar?.fillRect(100, 34, 200 * waterPercentage, 20);
+    this.waterBar?.fillRect(125, 34, 200 * waterPercentage, 20);
   }
 
   gameOver() {

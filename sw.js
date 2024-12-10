@@ -1,7 +1,15 @@
 /* Service Worker*/ 
 
 const CACHE_NAME = "phaser-react-cache-v1";
-const urlsToCache = ["/", "/index.html", "/style.css", "/favicon.png"];
+const urlsToCache = [
+  "/",
+  "/index.html",
+  "/style.css",
+  "/src/main.js",   // Ensure this path matches the final output file
+  "/src/App.js",     // Same here
+  "/favicon.png",    // Also check for correct path
+  "/manifest.webmanifest" // Web manifest for PWA functionality
+];
 
 // Install the Service Worker
 self.addEventListener("install", (event) => {
