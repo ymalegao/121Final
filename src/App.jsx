@@ -56,27 +56,12 @@ function App() {
 
   return (
     <div id="app">
-      <h1>Game Save/Load System</h1>
+      
       <div>
-        <input
-          type="text"
-          placeholder="Enter slot name"
-          value={slotName}
-          onChange={(e) => setSlotName(e.target.value)}
-        />
-        <button onClick={handleSave}>Save Game</button>
+
       </div>
       <div>
-        <h2>Save Slots</h2>
-        <ul>
-          {saveSlots.map((slot) => (
-            <li key={slot}>
-              {slot}
-              <button onClick={() => handleLoad(slot)}>Load</button>
-              <button onClick={() => handleDelete(slot)}>Delete</button>
-            </li>
-          ))}
-        </ul>
+
       </div>
       <PhaserGame ref={phaserRef} />
     </div>
