@@ -5,9 +5,11 @@
   "sun": "الشمس",
   "water": "الماء",
   "gameOverMessage": "انتهت اللعبة!",
+  "gameWinMessage": "لقد فزت!",
   "restartPrompt": "اضغط R لإعادة التشغيل",
   "restartMessage": "إعادة تشغيل اللعبة...",
   "autosavePrompt": "تم العثور على حفظ تلقائي. هل ترغب في المتابعة؟",
   "savePrompt": "أدخل اسم فتحة الحفظ:",
-  "loadPrompt": "أدخل اسم فتحة الحفظ للتحميل:"
+  "loadPrompt": "أدخل اسم فتحة الحفظ للتحميل:",
+  "turns": "أدوار"
 }

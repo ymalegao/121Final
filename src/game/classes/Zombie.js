@@ -15,7 +15,7 @@ export default class Zombie {
     if (scene) {
       // Create the zombie sprite if the scene is not null
       const { x, y } = this.getWorldPosition(gridX, gridY);
-      this.sprite = this.scene.add.sprite(x, y, texture).setOrigin(0.5).setScale(0.5);
+      this.sprite = this.scene.add.sprite(x, y, texture).setOrigin(0.5).setScale(0.15);
     } else {
       this.sprite = null; // No sprite if no scene
     }
@@ -24,6 +24,14 @@ export default class Zombie {
   // Get the current state of the zombie
   getState() {
     return { x: this.i, y: this.j };
+  }
+
+  getBounds() {
+    const x = this.i * 64 + 32; // Calculate X position
+    const y = this.j * 64 + 32; // Calculate Y position
+    const width = 64;  // Cell width
+    const height = 64; // Cell height
+    return new Phaser.Geom.Rectangle(x - width / 2, y - height / 2, width, height);
   }
 
   // Move the zombie forward one tile
@@ -90,7 +98,7 @@ export default class Zombie {
   reAddToScene(scene) {
     this.scene = scene;
     const { x, y } = this.getWorldPosition(this.i, this.j);
-    this.sprite = this.scene.add.sprite(x, y, 'Zombie').setOrigin(0.5).setScale(0.5);
+    this.sprite = this.scene.add.sprite(x, y, 'Zombie').setOrigin(0.5).setScale(0.15);
   }
 
   // Redraw the zombie on the scene
@@ -100,7 +108,7 @@ export default class Zombie {
     }
     if (this.scene) {
       const { x, y } = this.getWorldPosition(this.i, this.j);
-      this.sprite = this.scene.add.sprite(x, y, 'Zombie').setOrigin(0.5).setScale(0.5);
+      this.sprite = this.scene.add.sprite(x, y, 'Zombie').setOrigin(0.5).setScale(0.15);
     }
   }
 }

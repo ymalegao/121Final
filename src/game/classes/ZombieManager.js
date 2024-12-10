@@ -9,7 +9,7 @@ export default class ZombieManager {
   }
 
   spawnZombie() {
-    const gridX = this.gridManager.gridWidth + 4.5; // Set to the far-right column of the grid
+    const gridX = this.gridManager.gridWidth + 5; // Set to the far-right column of the grid
     const gridY = Phaser.Math.Between(0, this.gridManager.gridHeight - 1); // Random row
     const zombie = new Zombie(this.scene, gridX, gridY, 'Zombie'); // Use the correct texture key
 
@@ -52,6 +52,13 @@ export default class ZombieManager {
   redrawZombies() {
     this.zombies.forEach((zombie) => {
       zombie.redraw();
+    });
+  }
+
+// find all zombies
+  findZombies() {
+    this.zombies.forEach((zombie) => {
+      console.log(`Zombie found at (${zombie.x}, ${zombie.y})`)
     });
   }
 

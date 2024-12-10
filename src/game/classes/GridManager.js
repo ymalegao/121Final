@@ -65,7 +65,7 @@ export default class GridManager {
     for (let y = 0; y < this.gridHeight; y++) {
       for (let x = 0; x < this.gridWidth; x++) {
         // Generate random sun and water levels
-        const randomSun = Phaser.Math.Between(0, 1) + this.sunPlants; // Sun energy is immediate and lost
+        const randomSun = Phaser.Math.Between(0, 1) + (this.sunPlants); // Sun energy is immediate and lost
         const randomWater = Phaser.Math.Between(0, 1); // Water accumulates
 
         const { plantType, plantLevel, sunLevel, waterLevel } =

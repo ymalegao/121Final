@@ -40,6 +40,18 @@ export default class PlantManager {
     console.log(`Planted ${type} at (${gridX}, ${gridY})`);
   }
 
+  //Destroying Plant
+  removePlant(plant) {
+    // Remove the plant from the array
+    const index = this.plants.indexOf(plant);
+    if (index !== -1) {
+      this.plants.splice(index, 1);
+    }
+
+    // Remove the plant from the scene
+    plant.destroy();  // Assuming each plant has a `destroy()` method to remove it from the scene
+  }
+
   // Get the plant at a specific grid position
   getPlantAt(gridX, gridY) {
     return (
@@ -47,6 +59,8 @@ export default class PlantManager {
       null
     );
   }
+
+
 
   // Update all plants
   updatePlants() {

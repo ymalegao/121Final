@@ -57,6 +57,14 @@ export default class Plant {
     };
   }
 
+  getBounds() {
+    const x = this.i * 64 + 32; // Calculate X position
+    const y = this.j * 64 + 32; // Calculate Y position
+    const width = 64;  // Cell width
+    const height = 64; // Cell height
+    return new Phaser.Geom.Rectangle(x - width / 2, y - height / 2, width, height);
+  }
+
   checkGrowthConditions(currentSunlight, currentWater) {
     this.growthUnlocked =
       currentSunlight >= this.sunLight && currentWater >= this.water;

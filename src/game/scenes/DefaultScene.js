@@ -1,3 +1,4 @@
+
 import Phaser from 'phaser';
 import GridManager from '../classes/GridManager';
 import Player from '../classes/Player';
@@ -8,6 +9,9 @@ import GridState from '../classes/GridState';
 import MenuScene from './MenuScene';
 import { parseDSL, applyScenarioToGame } from '../../DSL/DSLParser';
 import Zombie from '../classes/Zombie';
+import AttackPlant from '../classes/AttackPlant';
+import SunPlant from '../classes/SunPlant';
+
 
 export default class DefaultScene extends Phaser.Scene {
   gridManager = null;
@@ -30,6 +34,7 @@ export default class DefaultScene extends Phaser.Scene {
     this.translations = {}; // Store translations
     this.currentLanguage = 'en'; // Default language
     this.t = 0;
+    
   }
 
   init(data) {
@@ -41,7 +46,7 @@ export default class DefaultScene extends Phaser.Scene {
 
   preload() {
     this.load.image('sunflower', '../assets/Sunflower.png');
-    this.load.image('Zombie', '../assets/Chomper.png');
+    this.load.image('Zombie', '../assets/zombie.png');
     this.load.image('attackPlant', '../assets/attackPlant.png');
 
     //Loading Languages
@@ -75,6 +80,9 @@ export default class DefaultScene extends Phaser.Scene {
     const scenario = await parseDSL('./src/DSL/gameplayscenario.dsl');
 
     this.isGameOver = false;
+
+    this.winCounter = 0;
+    this.winNumber = 20;
 
     this.gridManager = new GridManager(this, cellSize, gridWidth, gridHeight);
     this.player = new Player(this, this.gridManager, 0, 0);
@@ -183,9 +191,47 @@ export default class DefaultScene extends Phaser.Scene {
 
       // Advance turn
       if (event.key === 'N' || event.key === 'n') {
+        this.zombieManager.findZombies();
         this.gameState?.saveState();
         this.advanceTurn();
         this.gameState?.autoSave();
+        this.winCounter += 1;
+
+        if(this.winCounter > this.winNumber){
+              this.zombieManager?.destroyAllZombies();
+              this.add
+              .text(
+              this.cameras.main.centerX,
+              this.cameras.main.centerY - 30,
+              this.t.gameWinMessage,
+              {
+                fontFamily: '"Press Start 2P", sans-serif',
+                fontSize: '24px',
+                color: '#FFF44F',
+              }
+      )
+      .setOrigin(0.5);
+
+    this.add
+      .text(
+        this.cameras.main.centerX,
+        this.cameras.main.centerY + 20,
+        this.t.restartPrompt,
+        {
+          fontFamily: '"Press Start 2P", sans-serif',
+          fontSize: '16px',
+          color: '#FFFFFF',
+        }
+      )
+      .setOrigin(0.5);
+
+    const rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
+    rKey.once('down', () => {
+      console.log('Restarting game...');
+      this.scene.restart();
+    });
+        }
+
       }
 
       if (event.key === 'Z' || event.key === 'z') {
@@ -233,27 +279,29 @@ export default class DefaultScene extends Phaser.Scene {
         }
       }
     });
-
   }
-   
 
   createResourceDisplay() {
-    this.sunText = this.add.text(16, 16, this.t.sun + ': 0', {
+    this.sunText = this.add.text(1030, 16, this.t.sun + ': 0', {
       fontSize: '16px',
       color: '#fff',
     });
-    this.waterText = this.add.text(16, 40, this.t.water + ': 0', {
+    this.waterText = this.add.text(1030, 40, this.t.water + ': 0', {
+      fontSize: '16px',
+      color: '#fff',
+    });
+    this.winText = this.add.text(1030, 65, this.t.turns + ': ' + this.winCounter + '/' + this.winNumber, {
       fontSize: '16px',
       color: '#fff',
     });
 
     this.sunBar = this.add.graphics();
     this.sunBar.fillStyle(0xffff00, 1);
-    this.sunBar.fillRect(100, 10, 200, 20);
+    this.sunBar.fillRect(1125, 10, 200, 20);
 
     this.waterBar = this.add.graphics();
     this.waterBar.fillStyle(0x1e90ff, 1);
-    this.waterBar.fillRect(100, 34, 200, 20);
+    this.waterBar.fillRect(1125, 34, 200, 20);
   }
 
   advanceTurn() {
@@ -264,8 +312,69 @@ export default class DefaultScene extends Phaser.Scene {
     this.gridManager?.updateSunAndWaterLevels();
     this.plantManager?.updatePlants();
     this.zombieManager?.updateZombies();
-
+    this.checkZombieCollisions();
     this.updateResourceDisplay();
+  }
+
+  checkZombieCollisions() {
+
+    
+    // Loop through all zombies
+    this.zombieManager.zombies.forEach((zombie) => {
+      // Check for collision with any plant
+      this.plantManager.plants.forEach((plant) => {
+        if (this.checkCollision(zombie, plant)) {
+          // Destroy the plant on collision
+          this.plantManager.removePlant(plant);
+          console.log('A plant has been destroyed by a zombie!');
+        }
+      });
+    });
+  }
+  
+  // Check for collision between zombie and plant (you can modify this based on the specific collision logic you need)
+  checkCollision() {
+    if (!this.zombieManager || !this.plantManager) {
+      console.error('ZombieManager or PlantManager is not initialized.');
+      return;
+    }
+  
+    const zombies = this.zombieManager.zombies; // Use zombies from the ZombieManager
+    const plants = this.plantManager.plants; // Use plants from the PlantManager
+  
+    if (!zombies || !plants) {
+      console.error('Zombies or Plants arrays are undefined.');
+      return;
+    }
+  
+    zombies.forEach((zombie, zombieIndex) => {
+      plants.forEach((plant, plantIndex) => {
+        if (
+          Phaser.Geom.Intersects.RectangleToRectangle(
+            zombie.getBounds(),
+            plant.getBounds()
+          )
+        ) {
+          if (plant instanceof AttackPlant) {
+            // If it's an AttackPlant, destroy both the zombie and the plant
+            zombie.destroy();
+            zombies.splice(zombieIndex, 1);
+  
+            plant.destroy();
+            plants.splice(plantIndex, 1);
+  
+            console.log(
+              `Zombie and AttackPlant destroyed at (${zombie.i}, ${zombie.j})`
+            );
+          }
+          else if (plant instanceof SunPlant){
+            plant.destroy();
+            plants.splice(plantIndex, 1);
+            this.gridManager.sunPlants -= 1;
+          }
+        }
+      });
+    });
   }
 
   updateResourceDisplay() {
@@ -277,7 +386,13 @@ export default class DefaultScene extends Phaser.Scene {
         const cellData = this.gridManager?.getCellResources(x, y);
         if (cellData) {
           this.totalSun += cellData.sun;
+          if (this.totalSun > 500) {
+            this.totalSun = 500
+          }
           this.totalWater += cellData.water;
+          if (this.totalWater > 500) {
+            this.totalWater = 500
+          }
         }
       }
     }
@@ -288,6 +403,7 @@ export default class DefaultScene extends Phaser.Scene {
   updateSunAndWaterUI(totalSun, totalWater) {
     this.sunText?.setText(`${this.t.sun}: ${totalSun}`);
     this.waterText?.setText(`${this.t.water}: ${totalWater}`);
+    this.winText.setText(`${this.t.turns}: ${this.winCounter}/20`);
 
     const sunPercentage = Phaser.Math.Clamp(
       totalSun /
@@ -308,11 +424,11 @@ export default class DefaultScene extends Phaser.Scene {
 
     this.sunBar?.clear();
     this.sunBar?.fillStyle(0xffff00, 1);
-    this.sunBar?.fillRect(110, 10, 200 * sunPercentage, 20);
+    this.sunBar?.fillRect(1125, 10, 200 * sunPercentage, 20);
 
     this.waterBar?.clear();
     this.waterBar?.fillStyle(0x1e90ff, 1);
-    this.waterBar?.fillRect(125, 34, 200 * waterPercentage, 20);
+    this.waterBar?.fillRect(1125, 34, 200 * waterPercentage, 20);
   }
 
   gameOver() {

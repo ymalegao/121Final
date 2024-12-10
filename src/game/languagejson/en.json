@@ -5,9 +5,11 @@
   "sun": "Sun",
   "water": "Water",
   "gameOverMessage": "Game Over!",
+  "gameWinMessage": "You Survived!",
   "restartPrompt": "Press R to Restart",
   "restartMessage": "Restarting game...",
   "autosavePrompt": "An auto-save is available. Continue where you left off?",
   "savePrompt": "Enter a save slot name:",
-  "loadPrompt": "Enter a save slot name to load:"
+  "loadPrompt": "Enter a save slot name to load:",
+  "turns": "Turns"
 }

@@ -7,8 +7,11 @@ const urlsToCache = [
   "/style.css",
   "/src/main.js",   // Ensure this path matches the final output file
   "/src/App.js",     // Same here
-  "/favicon.png",    // Also check for correct path
-  "/manifest.webmanifest" // Web manifest for PWA functionality
+  "/sunflower-favicon/favicon-96x96.png", // Ensure the correct favicon path
+  "/sunflower-favicon/site.webmanifest",  // Add your webmanifest file here
+  "/sunflower-favicon/favicon/web-app-manifest-192x192.png", // Add icon
+  "/sunflower-favicon/favicon/web-app-manifest-512x512.png"  // Add icon
+  
 ];
 
 // Install the Service Worker
