@@ -7,9 +7,9 @@ export default class MenuScene extends Phaser.Scene {
 
   preload() {
     // Load translation files
-    this.load.json('en', 'src/game/languagejson/en.json'); // Use consistent keys
-    this.load.json('zh', 'src/game/languagejson/zh.json');
-    this.load.json('ar', 'src/game/languagejson/ar.json');
+    this.load.json('en', './game/languagejson/en.json'); // Use consistent keys
+    this.load.json('zh', './game/languagejson/zh.json');
+    this.load.json('ar', './game/languagejson/ar.json');
   }
 
   create() {

@@ -52,9 +52,9 @@ export default class DefaultScene extends Phaser.Scene {
     this.load.image('attackPlant', './assets/attackPlant.png');
 
     //Loading Languages
-    this.load.json('English', 'src/game/languagejson/en.json');
-    this.load.json('Chinese', 'src/game/languagejson/zh.json');
-    this.load.json('Arabic', 'src/game/languagejson/ar.json');  
+    this.load.json('English', './game/languagejson/en.json');
+    this.load.json('Chinese', './game/languagejson/zh.json');
+    this.load.json('Arabic', './game/languagejson/ar.json');  
   }
   
   async create() {
@@ -80,7 +80,7 @@ export default class DefaultScene extends Phaser.Scene {
     const gridWidth = 16;
     const gridHeight = 16;
     const dslURL = './DSL/gameplayscenario.dsl';
-    const scenario = await parseDSL('/121Final/DSL/gameplayscenario.dsl');
+    const scenario = await parseDSL(dslURL);
 
     this.isGameOver = false;
 

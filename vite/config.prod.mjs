@@ -9,11 +9,9 @@ const phasermsg = () => {
       process.stdout.write(`Building for production...\n`);
     },
     buildEnd() {
-      const line =
-        '---------------------------------------------------------';
+      const line = '---------------------------------------------------------';
       const msg = `❤️❤️❤️ Tell us about your game! - games@phaser.io ❤️❤️❤️`;
       process.stdout.write(`${line}\n${msg}\n${line}\n`);
-
       process.stdout.write(`✨ Done ✨\n`);
     },
   };
@@ -27,16 +25,19 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: 'src/game/languagejson', // Source directory with JSON files
-          dest: 'src/game', // Destination in the `dist` folder
+          // Copies all files from src/game/languagejson to dist/game/languagejson
+          src: 'src/game/languagejson',
+          dest: 'game/'
         },
         {
-          src: 'src/sw.js', // Service worker file
-          dest: '.', // Root of the `dist` folder
+          // Copies sw.js to dist/sw.js
+          src: 'src/sw.js',
+          dest: '.'
         },
         {
-          src: 'src/DSL', // Path to the DSL file
-          dest: 'DSL', // Destination in the dist folder,
+          // Copies all .dsl files from src/DSL to dist/DSL
+          src: 'src/DSL',
+          dest: 'DSL',
           include: ['*.dsl']
         },
       ],
