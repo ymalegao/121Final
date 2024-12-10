@@ -79,7 +79,7 @@ export default class DefaultScene extends Phaser.Scene {
     const cellSize = 64;
     const gridWidth = 16;
     const gridHeight = 16;
-    const scenario = await parseDSL('./src/DSL/gameplayscenario.dsl');
+    const scenario = await parseDSL('./DSL/gameplayscenario.dsl');
 
     this.isGameOver = false;
 
