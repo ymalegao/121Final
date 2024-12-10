@@ -376,7 +376,7 @@ Looking back on how we achieved the F2 requirements:
 
 ## F3 Video
 
-Check out the F2 Video showcasing our project:
+Check out the F2 Video showcasing our project: 
 
 ## F0 + F1 + F2: Determine if the previous F0 and F1 requirements remain satisfied in the latest version of your software
 
@@ -435,6 +435,62 @@ this.t = this.translations[this.currentLanguage];
 
 Localization ensures the game is accessible to a global audience while respecting cultural and linguistic nuances.
 
+## F3.c: Mobile Installation
+To ensure our game is installable on smartphone-class mobile devices, we utilized a Progressive Web App (PWA) approach. This allows our game to behave like a native application while leveraging existing web technologies, facilitating easier installation and updates.
 
+**Natural Language Explanation:** The PWA is created by implementing a service worker and a web app manifest, which enables the game to be added to the home screen of mobile devices. This process mimics the installation experience of standard applications, ensuring players can launch the game directly rather than navigating to a browser.
 
+### Technical Details:
+- **Service Worker (sw.js)**: 
+  - We registered a service worker that handles caching of assets to improve performance and allow offline access. The `CACHE_NAME` and the `urlsToCache` array define the resources that are stored.
+  - The service worker automatically caches essential files upon installation:
+    ```javascript
+    self.addEventListener("install", (event) => {
+      event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+          console.log("Opened cache");
+          return cache.addAll(urlsToCache);
+        })
+      );
+    });
+    ```
+- **Web App Manifest (site.webmanifest)**: 
+  - The manifest file defines the name, icons, theme color, and display properties of the PWA. This information is utilized by mobile devices to create a standalone app-like experience.
+    ```json
+    {
+      "name": "Garden Defense",
+      "icons": [
+        {
+          "src": "./sunflower-favicon/web-app-manifest-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "maskable"
+        },
+        {
+          "src": "./sunflower-favicon/web-app-manifest-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "purpose": "maskable"
+        }
+      ],
+      "display": "standalone"
+    }
+    ```
+- Players can install the game by visiting the website on a mobile device and selecting the "Add to Home Screen" option, which provides easy access akin to native applications.
 
+## F3.d: Mobile Play (Offline)
+To achieve satisfactory offline playability, the design of our game was adapted to ensure that it functions properly without requiring an active internet connection. 
+
+**Natural Language Explanation:** By utilizing the caching capabilities of our service worker, we allow the game to preload necessary assets, enabling users to play even when they are not connected to the internet. This enhances user experience, particularly in environments with unstable or absent internet access.
+
+### Technical Details:
+- The service worker caches all essential game assets and loads them from the cache when the game is played offline.
+- When a player tries to access the game without an internet connection, the service worker fetches the game files from the cache:
+  ```javascript
+  self.addEventListener("fetch", (event) => {
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        return response || fetch(event.request);
+      })
+    );
+  });
