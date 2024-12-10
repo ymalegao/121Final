@@ -1,9 +1,10 @@
-import GameState from '../game/classes/GameState';
-import GridManager from '../game/classes/GridManager';
-import PlantManager from '../game/classes/PlantManager';
-import ZombieManager from '../game/classes/ZombieManager';
+import GameState from '../../src/game/classes/GameState';
+import GridManager from '../../src/game/classes/GridManager';
+import PlantManager from '../../src/game/classes/PlantManager';
+import ZombieManager from '../../src/game/classes/ZombieManager';
 
 export async function parseDSL(fileUrl) {
+  
   const response = await fetch(fileUrl); // Fetch the file using fetch API
   const content = await response.text(); // Read the file content as text
   const lines = content.split('\n').map((line) => line.trim());
