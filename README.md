@@ -376,7 +376,7 @@ Looking back on how we achieved the F2 requirements:
 
 ## F3 Video
 
-Check out the F2 Video showcasing our project: 
+Check out the F3 Video showcasing our project: 
 
 ## F0 + F1 + F2: Determine if the previous F0 and F1 requirements remain satisfied in the latest version of your software
 
@@ -437,6 +437,11 @@ Localization ensures the game is accessible to a global audience while respectin
 
 ## F3.c: Mobile Installation
 To ensure our game is installable on smartphone-class mobile devices, we utilized a Progressive Web App (PWA) approach. This allows our game to behave like a native application while leveraging existing web technologies, facilitating easier installation and updates.
+
+Here are some examples of images for the mobile implementation on a smart-phone device:
+
+![Add to the Home Screen](./public/Add%20To%20Home%20Screen.PNG)
+![Garden Defense on Mobile](./public/Garden%20Defense%20on%20Mobile.PNG)
 
 **Natural Language Explanation:** The PWA is created by implementing a service worker and a web app manifest, which enables the game to be added to the home screen of mobile devices. This process mimics the installation experience of standard applications, ensuring players can launch the game directly rather than navigating to a browser.
 
