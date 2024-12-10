@@ -3,8 +3,6 @@
 const CACHE_NAME = "phaser-react-cache-v1";
 const urlsToCache = [
   "./",
-  "./index.html",
-  "./style.css",
   "./sunflower-favicon/favicon-96x96.png", // Ensure the correct favicon path
   "./sunflower-favicon/site.webmanifest",  // Add your webmanifest file here
   "./sunflower-favicon/web-app-manifest-192x192.png", // Add icon

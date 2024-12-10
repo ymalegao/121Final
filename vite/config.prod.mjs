@@ -28,15 +28,11 @@ export default defineConfig({
       targets: [
         {
           src: 'src/game/languagejson', // Source directory with JSON files
-          dest: 'game/languagejson', // Destination in the `dist` folder
+          dest: 'src/game', // Destination in the `dist` folder
         },
         {
           src: 'src/sw.js', // Service worker file
           dest: '.', // Root of the `dist` folder
-        },
-        {
-          src: 'public/sunflower-favicon', // Favicon and manifest files
-          dest: 'sunflower-favicon', // Keep folder structure in `dist`
         },
         {
           src: 'src/DSL', // Path to the DSL file

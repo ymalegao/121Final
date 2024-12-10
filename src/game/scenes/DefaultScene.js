@@ -45,14 +45,14 @@ export default class DefaultScene extends Phaser.Scene {
 
 
   preload() {
-    this.load.image('sunflower', '121Final/assets/Sunflower.png');
-    this.load.image('Zombie', '121Final/assets/zombie.png');
-    this.load.image('attackPlant', '121Final/assets/attackPlant.png');
+    this.load.image('sunflower', '../assets/Sunflower.png');
+    this.load.image('Zombie', '../assets/zombie.png');
+    this.load.image('attackPlant', '../assets/attackPlant.png');
 
     //Loading Languages
-    this.load.json('English', '121Final/game/languagejson/en.json');
-    this.load.json('Chinese', '121Final/game/languagejson/zh.json');
-    this.load.json('Arabic', '121Final/game/languagejson/ar.json');  
+    this.load.json('English', 'src/game/languagejson/en.json');
+    this.load.json('Chinese', 'src/game/languagejson/zh.json');
+    this.load.json('Arabic', 'src/game/languagejson/ar.json');  
   }
   
   async create() {
