@@ -39,8 +39,9 @@ export default defineConfig({
           dest: 'sunflower-favicon', // Keep folder structure in `dist`
         },
         {
-          src: 'src/DSL/gameplayscenario.dsl', // Path to the DSL file
-          dest: 'src/DSL/', // Destination in the dist folder
+          src: 'src/DSL', // Path to the DSL file
+          dest: 'DSL', // Destination in the dist folder,
+          include: ['*.dsl']
         },
       ],
     }),
