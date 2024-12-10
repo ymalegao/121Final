@@ -1,0 +1,15 @@
+{
+  "title": "Garden Defense",
+  "instructions": "Instructions:\n- Use Arrow Keys to Move.\n- Press P to Plant a Sun Plant.\n- Press A to Plant an Attack Plant.\n- Press N to Advance a Turn.\n- Press Z to Undo.\n- Press Y to Redo. \n- Press S to Save and name the Save. \n- Press L to load the name of the save. \n- Defend your grid and grow your plants!",
+  "start": "Press SPACE to Start",
+  "sun": "Sun",
+  "water": "Water",
+  "gameOverMessage": "Game Over!",
+  "gameWinMessage": "You Survived!",
+  "restartPrompt": "Press R to Restart",
+  "restartMessage": "Restarting game...",
+  "autosavePrompt": "An auto-save is available. Continue where you left off?",
+  "savePrompt": "Enter a save slot name:",
+  "loadPrompt": "Enter a save slot name to load:",
+  "turns": "Turns"
+}

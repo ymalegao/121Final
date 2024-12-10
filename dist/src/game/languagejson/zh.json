@@ -1,0 +1,15 @@
+{
+  "title": "植物大战僵尸网格游戏",
+  "instructions": " 说明：\n- 使用箭头键移动。\n- 按 P 种植太阳植物。\n- 按 A 种植攻击植物。\n- 按 N 前进一回合。\n- 按 Z 种植植物撤消。\n- 按 Y 重做。 \n- 按 S 保存并命名保存 \n- 按 L 加载保存的名称 \n- 保卫你的网格并种植你的植物！",
+  "start": "按空格键开始",
+  "sun": "阳光",
+  "water": "水",
+  "gameOverMessage": "游戏结束！",
+  "gameWinMessage": "你赢了！",
+  "restartPrompt": "按 R 重新开始",
+  "restartMessage": "正在重新开始游戏...",
+  "autosavePrompt": "检测到自动保存。要继续游戏吗？",
+  "savePrompt": "输入一个保存槽名称:",
+  "loadPrompt": "输入一个保存槽名称以加载:",
+  "turns": "回合"
+}

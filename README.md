@@ -160,6 +160,7 @@ lessons about game design and deployment.
 
 Run the two commands below to install the packages and dependencies:
 `npm install -D eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-config-prettier prettier eslint-plugin-prettier`
+
 `npm install --save-dev --global prettier`
 
 To run the linter use this command: `npx eslint .`
@@ -259,7 +260,7 @@ The modular design ensured seamless integration across files like
 efficient implementation of requirements like F1.b and F1.c without duplication
 of effort.
 
-# F2 Devlog - [12/09/2024]
+# F2 Devlog - [12/08/2024]
 
 ## F2 Video
 
@@ -370,3 +371,70 @@ Looking back on how we achieved the F2 requirements:
 - **Platform Transition:** Implemented the migration from TypeScript to
   JavaScript, adjusting our code structure to fit JavaScript’s capabilities
   while ensuring that core functionalities and game mechanics were preserved.
+
+# F3 Devlog - [12/09/2024]
+
+## F3 Video
+
+Check out the F2 Video showcasing our project:
+
+## F0 + F1 + F2: Determine if the previous F0 and F1 requirements remain satisfied in the latest version of your software
+
+The latest version of our project fulfills the F0, F1, and F2 requirements, with significant improvements to core mechanics. We implemented a win condition where players must survive 20 turns and a loss condition triggered if a zombie reaches the leftmost column. Collision functionality was added, allowing Attack Plants to destroy both themselves and zombies upon contact, while Sun Plants are destroyed by zombies, reducing resource production and adding strategic depth.
+
+## F3.a: Internationalization
+
+Our internationalization system ensures that all text visible to the player can be translated into different written languages. We structured the implementation to make adding new languages straightforward and scalable.
+
+**Natural Language Explanation:** All player-visible text, such as titles, instructions, and prompts, is extracted into external JSON files. This approach allows developers or translators to update or add new languages without modifying the game logic. The selected language dynamically determines which file is loaded, ensuring a seamless user experience.
+
+### Technical Details:
+
+- The JSON structure organizes strings in key-value pairs, where keys represent the text's purpose, and values are the translated text. For example:
+{
+  "gameOverMessage": "Game Over!",
+  "instructions": "Use Arrow Keys to Move."
+}
+- The t object is used to reference strings in the code, such as t.gameOverMessage. This abstraction ensures no hard-coded text exists in the game logic.
+- The currentLanguage parameter is passed between scenes to persist the user's language choice across the session.
+- A fallback mechanism logs warnings for missing translations, helping developers quickly identify and resolve untranslated keys.
+
+By centralizing text in JSON files and dynamically loading the appropriate file, we provide a robust foundation for supporting any written language.
+
+## F3.b: Localization
+
+We localized the game into three distinct languages: English (default), Arabic (right-to-left script), and Simplified Chinese (logographic script). Each language was carefully integrated to ensure proper functionality and cultural accuracy.
+
+**Natural Language Explanation:** Localization involves adapting the game for players who speak different languages. This includes translating visible text and adjusting the UI for language-specific nuances, such as right-to-left alignment for Arabic or concise phrasing for Chinese. Language selection is accessible through the MenuScene, allowing players to choose their preferred language before starting the game.
+
+### Technical Details:
+
+- English (Default): English is the base language and requires no additional changes. Example string:
+{
+  "gameOverMessage": "Game Over!"
+}
+- Arabic (RTL): Text alignment was adjusted using Phaser's text rendering properties to support right-to-left layouts. UI elements were mirrored to maintain readability.
+- Example string:
+{
+  "gameOverMessage": "انتهت اللعبة!"
+}
+- Simplified Chinese (Logographic): Google Noto fonts were used to render complex Chinese characters without clipping or distortion. Text was carefully phrased to fit within UI constraints.
+- Example string: 
+{
+  "gameOverMessage": "游戏结束！"
+}
+- Translation Workflow: Initial translations were generated using ChatGPT with prompts like: "Translate 'Game Over' into Arabic and ensure it is suitable for a gaming context."
+- Language selection: Players select their language in the MenuScene via interactive buttons, and the currentLanguage persists across scenes.
+- Example:
+this.translations = {
+  en: this.cache.json.get('en'),
+  zh: this.cache.json.get('zh'),
+  ar: this.cache.json.get('ar')
+};
+this.t = this.translations[this.currentLanguage];
+
+Localization ensures the game is accessible to a global audience while respecting cultural and linguistic nuances.
+
+
+
+
