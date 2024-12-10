@@ -47,9 +47,9 @@ export default class DefaultScene extends Phaser.Scene {
   preload() {
     
 
-    this.load.image('sunflower', '../assets/Sunflower.png');
-    this.load.image('Zombie', '../assets/zombie.png');
-    this.load.image('attackPlant', '../assets/attackPlant.png');
+    this.load.image('sunflower', './assets/Sunflower.png');
+    this.load.image('Zombie', './assets/zombie.png');
+    this.load.image('attackPlant', './assets/attackPlant.png');
 
     //Loading Languages
     this.load.json('English', 'src/game/languagejson/en.json');
@@ -79,7 +79,7 @@ export default class DefaultScene extends Phaser.Scene {
     const cellSize = 64;
     const gridWidth = 16;
     const gridHeight = 16;
-    const scenario = await parseDSL('/121Final//src/DSL/gameplayscenario.dsl');
+    const scenario = await parseDSL('./src/DSL/gameplayscenario.dsl');
 
     this.isGameOver = false;
 
