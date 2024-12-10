@@ -440,8 +440,11 @@ To ensure our game is installable on smartphone-class mobile devices, we utilize
 
 Here are some examples of images for the mobile implementation on a smart-phone device:
 
-![Add to the Home Screen](./public/Add%20To%20Home%20Screen.PNG)
-![Garden Defense on Mobile](./public/Garden%20Defense%20on%20Mobile.PNG)
+<!-- ![Add to the Home Screen](./public/Add%20To%20Home%20Screen.PNG)
+![Garden Defense on Mobile](./public/Garden%20Defense%20on%20Mobile.PNG) -->
+
+<img src="./public/Add%20To%20Home%20Screen.PNG" alt="Add to the Home Screen" width="300" />  <!-- Adjust the width as needed -->
+<img src="./public/Garden%20Defense%20on%20Mobile.PNG" alt="Garden Defense on Mobile" width="300" />  <!-- Adjust the width as needed -->
 
 **Natural Language Explanation:** The PWA is created by implementing a service worker and a web app manifest, which enables the game to be added to the home screen of mobile devices. This process mimics the installation experience of standard applications, ensuring players can launch the game directly rather than navigating to a browser.
 
