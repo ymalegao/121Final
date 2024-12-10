@@ -47,6 +47,7 @@ export default class MenuScene extends Phaser.Scene {
         .on('pointerdown', () => {
           this.currentLanguage = lang.key;
           this.renderMenu(); // Re-render menu with the selected language
+          //this.scene.start('DefaultScene', { selectedLanguage: lang.key }); // Pass language to the next scene
         });
     });
   }
@@ -121,10 +122,10 @@ export default class MenuScene extends Phaser.Scene {
       );
 
       // Start DefaultScene on SPACE press
-      spaceKey.once('down', () => {
-        console.log('Starting game...');
-        this.scene.start('DefaultScene'); // Replace with your game scene
-      });
-    }
+    spaceKey.once('down', () => {
+      console.log('Starting game...');
+      this.scene.start('DefaultScene', { selectedLanguage: this.currentLanguage });
+    });
   }
+}
 }

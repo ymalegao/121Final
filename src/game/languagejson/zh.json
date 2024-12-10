@@ -7,5 +7,7 @@
   "gameOverMessage": "游戏结束！",
   "restartPrompt": "按 R 重新开始",
   "restartMessage": "正在重新开始游戏...",
-  "autosavePrompt": "检测到自动保存。要继续游戏吗？"
+  "autosavePrompt": "检测到自动保存。要继续游戏吗？",
+  "savePrompt": "输入一个保存槽名称:",
+  "loadPrompt": "输入一个保存槽名称以加载:"
 }

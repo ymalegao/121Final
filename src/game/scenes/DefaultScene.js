@@ -5,6 +5,7 @@ import PlantManager from '../classes/PlantManager';
 import ZombieManager from '../classes/ZombieManager';
 import GameState from '../classes/GameState';
 import GridState from '../classes/GridState';
+import MenuScene from './MenuScene';
 import { parseDSL, applyScenarioToGame } from '../../DSL/DSLParser';
 
 export default class DefaultScene extends Phaser.Scene {
@@ -25,7 +26,17 @@ export default class DefaultScene extends Phaser.Scene {
 
   constructor() {
     super({ key: 'DefaultScene' });
+    this.translations = {}; // Store translations
+    this.currentLanguage = 'en'; // Default language
+    this.t = 0;
   }
+
+  init(data) {
+    if (data.selectedLanguage) {
+      this.currentLanguage = data.selectedLanguage;
+    }
+  }
+
 
   preload() {
     this.load.image('sunflower', '../assets/Sunflower.png');
@@ -37,13 +48,25 @@ export default class DefaultScene extends Phaser.Scene {
     this.load.json('Chinese', 'src/game/languagejson/zh.json');
     this.load.json('Arabic', 'src/game/languagejson/ar.json');  
   }
-
+  
   async create() {
+    if(this.currentLanguage){
+
+      console.log("This is current Language: ", this.currentLanguage);
+    }
     this.translations = {
       en: this.cache.json.get('en'),
       zh: this.cache.json.get('zh'),
       ar: this.cache.json.get('ar'),
     };
+    this.t = this.translations[this.currentLanguage];
+
+    // Handle missing translations gracefully
+    if (!this.t) {
+      console.error(`Missing translations for language: ${this.currentLanguage}`);
+      return;
+    }
+  
     
     const cellSize = 64;
     const gridWidth = 16;
@@ -72,12 +95,6 @@ export default class DefaultScene extends Phaser.Scene {
       this.zombieManager
     );
 
-    this.translations = {
-      English: this.cache.json.get('English'),
-      Chinese: this.cache.json.get('Chinese'),
-      Arabic: this.cache.json.get('Arabic'),
-    };
-
     console.log('Scenario applied properly', scenario);
 
     this.setupInputHandlers();
@@ -86,7 +103,7 @@ export default class DefaultScene extends Phaser.Scene {
     const autoSaveExists = localStorage.getItem('autoSaveSlot') !== null;
     if (autoSaveExists) {
       const continueGame = confirm(
-        'An auto-save is available. Continue where you left off?'
+        this.t.autosavePrompt
       );
       if (continueGame) {
         const loadedState = GameState.loadFromSlot(
@@ -169,15 +186,62 @@ export default class DefaultScene extends Phaser.Scene {
         this.advanceTurn();
         this.gameState?.autoSave();
       }
+
+      if (event.key === 'Z' || event.key === 'z') {
+        console.log(
+          'sun and water resource before undo: ' +
+            this.totalSun +
+            ' ' +
+            this.totalWater,
+        );
+        this.gameState.undo();
+        console.log(
+          'sun and water resource after undo: ' +
+            this.totalSun +
+            ' ' +
+            this.totalWater,
+        );
+      };
+
+      if (event.key === 'Y' || event.key === 'y') {
+        this.gameState.redo();
+      };
     });
+    
+    this.input.keyboard.on('keydown-S', () => {
+      const slotName = prompt(this.t.savePrompt);
+      if (slotName) {
+        this.gameState.saveToSlot(`saveSlot-${slotName}`);
+      }
+    });
+
+    // Load game from a slot
+    this.input.keyboard.on('keydown-L', () => {
+      const slotName = prompt(this.t.loadPrompt);
+      if (slotName) {
+        const loadedState = GameState.loadFromSlot(
+          `saveSlot-${slotName}`,
+          this.gridManager.gridState,
+          this.player,
+          this.plantManager,
+          this.zombieManager,
+          this,
+        );
+        if (loadedState) {
+          this.gameState = loadedState;
+        }
+      }
+    });
+
   }
+   
 
   createResourceDisplay() {
-    this.sunText = this.add.text(16, 16, 'Sun: 0', {
+    this.sunText = this.add.text(16, 16, this.t.sun + ': 0', {
       fontSize: '16px',
       color: '#fff',
     });
-    this.waterText = this.add.text(16, 40, 'Water: 0', {
+    this.waterText = this.add.text(16, 40, this.t.water + ': 0', {
       fontSize: '16px',
       color: '#fff',
     });
@@ -221,8 +285,8 @@ export default class DefaultScene extends Phaser.Scene {
   }
 
   updateSunAndWaterUI(totalSun, totalWater) {
-    this.sunText?.setText(`Sun: ${totalSun}`);
-    this.waterText?.setText(`Water: ${totalWater}`);
+    this.sunText?.setText(`${this.t.sun}: ${totalSun}`);
+    this.waterText?.setText(`${this.t.water}: ${totalWater}`);
 
     const sunPercentage = Phaser.Math.Clamp(
       totalSun /
@@ -259,7 +323,7 @@ export default class DefaultScene extends Phaser.Scene {
       .text(
         this.cameras.main.centerX,
         this.cameras.main.centerY - 30,
-        'Game Over!',
+        this.t.gameOverMessage,
         {
           fontFamily: '"Press Start 2P", sans-serif',
           fontSize: '24px',
@@ -272,7 +336,7 @@ export default class DefaultScene extends Phaser.Scene {
       .text(
         this.cameras.main.centerX,
         this.cameras.main.centerY + 20,
-        'Press R to Restart',
+        this.t.restartPrompt,
         {
           fontFamily: '"Press Start 2P", sans-serif',
           fontSize: '16px',
