@@ -499,3 +499,136 @@ To achieve satisfactory offline playability, the design of our game was adapted 
       })
     );
   });
+
+
+## Individual Contributions
+
+## Our group talked to the professor before the final presentation to discuss the contributions since we primarily used liveshare. Adam suggested we find the specific commits that we individally contributed to and so that is what we did. Below you will see what everyone worked on individually and together. 
+
+For our project we extensively used the VS Code's 
+
+### Atri Mehta
+
+- Added Collision Detection and Zombie Behavior. This was to initially set the zombie too move on the grid and 
+enable collision to work.
+    - https://github.com/ymalegao/121Final/commit/7f128591bcf173f3ff89b323b6631673474a3b88
+  
+- DSL Parsing and Gameplayscenario
+    - https://github.com/ymalegao/121Final/commit/8e7700c3fd06ef7db19a19ead58d99f0ce61c42c
+    - I developed the DSLParser and gameplay scenario system, ensuring a clean and direct coding style.
+
+- Logographic and Right-to-Left Script Implementation
+    - https://github.com/ymalegao/121Final/commit/c9bc433671b289c1e82a2888637c8951140dc424
+    - I implemented support for both logographic and right-to-left (RTL) scripts, enabling text localization for  three languages: a logographic script (e.g., Chinese or Japanese), an RTL script (e.g., Arabic), and a baseline language (English).
+
+- Worked on grid ad polishing zombies to attack properly
+    - https://github.com/ymalegao/121Final/commit/c3ca83403c758f24881f1379be4d0381741c2a8a
+    - I worked on making sure the grid was centered and all the loading is done properly
+
+- I got the game to save locally when Ctrl+S was pressed and got the ground work going on how to implement in slots:
+  - https://github.com/ymalegao/121Final/commit/6a170ccd3ff99f57fd373c2f5fa861061d1251f3
+  - I tried to implement the slots but could not get it to work. Yash and Luc pulled my code and were able
+  to figure it out from the outline of my code
+
+
+### Rahamat Zaman
+
+- Adjusted Game Canvas and UI, and Internal DSL files (structurally changing the plant types for sunflower and attack plants)
+    - https://github.com/ymalegao/121Final/commit/1b8c7003798ed46c2c9813e95f5a97705be67739
+
+    - Worked on making the plant types strucally different using the internal DSL, and adjusted the dimensions of the Canvas and UI
+    
+- Resource Management (Water and Sun) and Auto Code Styling Tools such as Eslint and Prettier 
+    - https://github.com/ymalegao/121Final/commit/7c81888b324581108c8804f71c9986c0a4fea779
+
+    - Created a progress bar for the sun and water to showcase the resource management, and set up auto styling tools like ESlint and Prettier
+    
+- Started implementing Progressive Web App (PWA) for Mobile Play using the manifest file, and began implementing Offline Mobile Play using the service worker
+    - https://github.com/ymalegao/121Final/commit/c3ca83403c758f24881f1379be4d0381741c2a8a -- Not my commit (LiveShare)
+
+    - Began working on the PWA, and the offline feature by creating the service worker file and the manifest file
+
+- Working on F3.c and F3.d the mobile installation and offline play with Yash
+    - https://github.com/ymalegao/121Final/commit/34dd94f499451e9987812e237835560a27975803#diff-705a343a1ce4e0f83d32014fee0e343315ebd2ee4f99c0202deaaf34f143566c -- Not my commit (LiveShare)
+
+    - Tried to make progress on the service worker and the manifest file by working on the favicon and making sure that the program is able to add to the home screen, set up http server and worked with that
+
+- Canvas and UI changes, and working on F3.c
+    - https://github.com/ymalegao/121Final/commit/4c21466d51bd5bcfdc8b9b498ca4fd2fbaf295be -- Not my commit (LiveShare)
+
+    - Worked on the F3.c mobile installation, and started to change the code in the files, and added them to public due to the files having to cache the assets and files.
+
+### Jay Kumar
+Adding the attack plant class, sprite, and spawning functionality to the play scene
+ - https://github.com/ymalegao/121Final/commit/af7cad3810c083f7584ac081a77214dcf67807db
+ - Created a separate class to incorporate a second plant type into the game: the attack plant. Added the sprite and incorporated spawning functionality into play scene.
+
+Changing primary language from Typescript to Javascript, changing tsx files to jsx files
+ - https://github.com/ymalegao/121Final/commit/9f514206833499a63481bfc3a7f51f7bb241f5d9
+ - Iterated through current ts files to convert them to javascript (this was done via liveshare). This included the classes and class managers, phaser scenes, and the tsx files.
+
+Canvas and UI updates, capping resource generation
+ - https://github.com/ymalegao/121Final/commit/4c21466d51bd5bcfdc8b9b498ca4fd2fbaf295be
+ - Organized the UI of the game to fit with the new changes that had been made (for example, display turn count, formatting the resource stats, capping resource generation to be no more than 500, correcting resource scaling)
+
+
+### Yash Malegaonkar
+  - Hosted the build to github pages by using the node.js.yaml and set up the project with a react and vite framework
+    -https://github.com/ymalegao/121Final/commit/35e19d877fc7c30271306f8f90238c3353a55112
+
+  - Worked on F1 A and D and made the gamestate class in order to work with the gridstate to save the player's state in a array, and worked on the undo and redo functions, but was not able to get them to fully work in this commit
+    
+    -F1A:
+      -https://github.com/ymalegao/121Final/commit/500c240b8cceed2b4d4224100e6c5f7ada32a77d
+    -F1D:
+      https://github.com/ymalegao/121Final/commit/461cedcaaa014731b2b35418ae3ab4094537b3ad
+  -Worked on F1D further and refactored the Zombie code from default scene to be in a new ZombieManager and then also fixed f1D after refactoring because the error was with the zombie array and creating new ones
+    Zombie class refactoring:
+    -https://github.com/ymalegao/121Final/commit/dda6f109049e2f9a7a618e265575ffb13497e58a
+
+    -undo redo fix:
+      https://github.com/ymalegao/121Final/commit/1a5959e2a552f11346254613ac689f6bbc3ddd1b
+  -
+  
+  -Worked on completing the saving and loading requirments that my team had started. I got rid of their saveManagaer and instead just had the array of savedGamesates that you could save in local storage by serializing and deserialziing to load
+    - https://github.com/ymalegao/121Final/commit/1fbba1d92d6d6ae6e7b927c86090b176908fabe7
+  
+  -Worked on autosave
+    https://github.com/ymalegao/121Final/commit/e9e71a290aa8db3585fabaf6cd6084c95b7c462a
+    
+  -Worked on F3C and F3D which involved sw.js and the webmanifest that was worked on by Raha. I used the favicon generator to give me favicons and it gave me a manifest as well, so I changed that, and then fixed a lot of links and made them relative links:
+    https://github.com/ymalegao/121Final/commit/34dd94f499451e9987812e237835560a27975803
+
+  -Finally got F3C and f3D working and deployed successfully to github pages with the cache, and PWA thing wokring with no errors and sprites laoding and all the other commits before this are short because i dint know how to test the deployment because it worked with npx httpx but not on the github pahges so I had to keep redeploying... 
+    -https://github.com/ymalegao/121Final/commit/8153a8832bb688e91523af7c81422bd7e9aad5ac
+   
+
+### Luc Harnist
+ - Water Sun Resource System & Advancing Time Manually
+     - https://github.com/ymalegao/121Final/commit/a98571debfe1dc6ff81f2491058d960873debf5e 
+     
+     - Designed and implemented the foundational resource management system for water and sunlight. Managing time and turn based gameplay which is important to take into account when balancing gameplay. Introduced manual time advancement, which allows players to progress through turns with better foresight.
+
+ - Bug Fixing
+     - https://github.com/ymalegao/121Final/commit/77a403d3ed77edd4deef2a19e153c6ef6a6906f9
+
+     - Identified and resolved a key bug in the undoing and redoing mechanic. Fixed the bug (Zombies infinitely spawned and would not dissapear when advancing the turn)
+
+ - Helped with Undoing and Redoing
+     - https://github.com/ymalegao/121Final/commit/c9bc433671b289c1e82a2888637c8951140dc424
+
+     - Contributed to the design and debugging of the undo/redo stacks, allowing players to reverse actions seamlessly. My involvement enhanced both usability and code maintainability.
+
+ - Worked / helped with UI of Game & Created plant and zombie interactions
+     - https://github.com/ymalegao/121Final/commit/4c21466d51bd5bcfdc8b9b498ca4fd2fbaf295be
+
+     - https://github.com/ymalegao/121Final/commit/361ecd1a355dee7d6070c0f73b789c749879f922
+
+     - I helped with the interface design to ensure an intuitive and visually engaging user experience. I implemented the interactions between plants and zombies, including attack mechanics and growth animations.
+
+ - Created the PlantDSL and helped create the Parser
+     - https://github.com/ymalegao/121Final/commit/8e7700c3fd06ef7db19a19ead58d99f0ce61c42c -- Not my commit (LiveShare)
+
+     - https://github.com/ymalegao/121Final/commit/1b8c7003798ed46c2c9813e95f5a97705be67739 -- Not my commit (LiveShare)
+
+     - I developed a domain-specific language (DSL) for defining plant behaviors and growth conditions, which helped improve modularity and helped with organization. I assisted in building the parser, translating the DSL into executable game logic. This streamlined game mechanics implementation, reducing complexity in future updates.
